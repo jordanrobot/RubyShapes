@@ -38,21 +38,25 @@ Library Structure
     .initialize
 
   Class objects
+    round_tube
     square_tube
     rectangular tubing
     rod
     bar
     plate
 
-  Class Printers - outputs data
+  Class ShapeUtils - i/o of calculated shape data
     .props
     .bigprops
     .hash
     .bighash
     .test_object
+    .test_var
+    .columns -> BROKEM
+    .gauge_converter
 
 =end
-#require 'profile'
+require 'profile'
 require 'bigdecimal'
 require 'bigdecimal/math'
 require 'bigdecimal/util'
@@ -63,14 +67,12 @@ Pi = BigDecimal.PI(20)
 
 =begin
 
-==Printers
-
-this module consistently outputs the calculated shapes data
-
-note: all Shape classes mixin the Printer Class
-
+  ==ShapeUtils
+  this module handles i/o of the calculated shape values
+  note: all Shape classes mixin this ShapeUtils Class
+  
 =end
-module Printers
+module ShapeUtils
     #prints rounded (4 places) attributes as floats.  Normally will print all attributes or those specified with obj.props("attribute")
   def props(arg="list")
     if arg == "list"
@@ -106,17 +108,17 @@ module Printers
   
   #test individual shape objects and return results
   def test_shape
-    puts 'Return all values in the object (Floats):'
+    puts 'Props (Floats):'
     self.props
 
     puts
 
-    puts 'Return individual values (Floats):'
-    self.props("t")
+    puts 'Individual values (Floats):'
+    self.props("x")
 
     puts
 
-    puts 'Return all values in the ojbect (BigDecimals):'
+    puts 'Bigprops (BigDecimals):'
     self.bigprops
 
     puts
@@ -135,7 +137,7 @@ module Printers
     p self.bighash
   end
 
-  def test
+  def test_vars
     p "a:  #{@a.class}"
     p "i:  #{@i.class}"
     p "s:  #{@s.class}"
@@ -221,11 +223,11 @@ a round_rube object is part of the shape class
 class Round_tube
   attr_accessor :d, :t, :a, :i, :s, :r, :w
   
-  include Printers
+  include ShapeUtils
 
   def initialize(d, t)  
-    @d = d.to_d
-    @t = t.to_d
+    @d = d.to_s.to_d
+    @t = t.to_s.to_d
 
     #declare class Variables
     @a = BigDecimal.new("0")
@@ -247,7 +249,7 @@ class Round_tube
      @r = sqrt(@i/@a, 9)
 
      #Calculate Round Tube Weight
-     @w = (3.3996.to_d*@a)
+     @w = (BigDecimal.new("3.3996")*@a)
 
      #add caculated values to a hash
      @hash = {"d" => @d.round(4).to_f, "t" => @t.round(4).to_f, "a" => @a.round(4).to_f, "i" => @i.round(4).to_f, "s" => @s.round(4).to_f, "r" => @r.round(4).to_f, "w" => @w.round(4).to_f }
@@ -279,7 +281,7 @@ Class Square_tube(od, thickness, radius)
 class Square_tube
   attr_accessor :d, :ra, :t, :a, :i, :s, :r, :w
   
-  include Printers
+  include ShapeUtils
 
   def initialize(d, t, ra)  
 
@@ -296,7 +298,7 @@ class Square_tube
     @s = BigDecimal.new("0")
     @r = BigDecimal.new("0")
     @w = BigDecimal.new("0")
-test
+
     #calculate Square Area
     @a = (@t * ((4 * @d) - (8 * @ra) + ( Pi * (2*@ra - @t) ) ))
 
@@ -326,7 +328,7 @@ test
     @s = ((2 * @i)/@d)
     
     #Radius of Gyration
-    @r = (@i/@a).sqrt(10)
+    @r = (@i/@a).sqrt(2)
     
     #Weight / ft.
     @w = (3.3996.to_d*@a)
@@ -335,7 +337,7 @@ test
 #    @hash = {"d" => @d.round(4).to_f, "t" => @t.round(4).to_f, "a" => @a.round(4).to_f, "i" => @i.round(4).to_f, "s" => @s.round(4).to_f, "r" => @r.round(4).to_s, "w" => @w.round(4).to_s }
 
     #add caculated values to a hash
-    @hash = {"d" => @d.round(4).to_f, "t" => @t.round(4).to_f, "a" => @a.round(4).to_f, "i" => @i.round(4).to_f, "s" => @s.round(4).to_f, "r" => @r.round(4).to_f, "w" => @w.round(4).to_f }
+    @hash = {"d" => @d.round(4), "t" => @t.round(4), "a" => @a.round(4), "i" => @i.round(4), "s" => @s.round(4), "r" => @r.round(4), "w" => @w.round(4) }
     @bighash = {"d" => @d, "t" => @t, "a" => @a, "i" => @i, "s" => @s, "r" => @r, "w" => @w }
 
   end
@@ -357,13 +359,13 @@ Methods
 class Rec_tube
   attr_accessor :x, :y, :t, :ra, :a, :i_x, :i_y, :s_x, :s_y, :r_x, :r_y, :w
   
-  include Printers
+  include ShapeUtils
   
   def initialize(x, y, t, ra)  
-    @x = x.to_d
-    @y = y.to_d
-    @t = t.to_d
-    @ra = ra.to_d
+    @x = x.to_s.to_d
+    @y = y.to_s.to_d
+    @t = t.to_s.to_d
+    @ra = ra.to_s.to_d
     
     @a = BigDecimal.new("0")
     @c = BigDecimal.new("1")
@@ -376,25 +378,25 @@ class Rec_tube
     @w = BigDecimal.new("0")
     
     #----------calculate area----------
-    @a = (@t*((2*(@x+@y))-(8*@ra)+(Pi*((2*@ra)-@t))))
+    @a = (@t*(( BigDecimal.new("2")*(@x+@y))-( BigDecimal.new("8")*@ra)+(Pi*(( BigDecimal.new("2")*@ra)-@t))))
 
     #method - calculate Second Moment of Inertia
     def calc_i(c, b)
-      sec_1 = ( (@t**3) * (b - (2*@ra) ) )/6
-      sec_2 = 2*@t*(b-(2*@ra))
-      sec_3 = ((c-@t)/2)**2
-      sec_4 = (@t*(  (c-(2*@ra))**3))/6
-      sec_5 = (Pi/4)-(8/((9/2)*Pi))
+      sec_1 = ( (@t** BigDecimal.new("3")) * (b - ( BigDecimal.new("2")*@ra) ) )/ BigDecimal.new("6")
+      sec_2 =  BigDecimal.new("2")*@t*(b-( BigDecimal.new("2")*@ra))
+      sec_3 = ((c-@t)/ BigDecimal.new("2"))** BigDecimal.new("2")
+      sec_4 = (@t*(  (c-( BigDecimal.new("2")*@ra))** BigDecimal.new("3")))/ BigDecimal.new("6")
+      sec_5 = (Pi/ BigDecimal.new("4"))-( BigDecimal.new("8")/(( BigDecimal.new("9")/ BigDecimal.new("2"))*Pi))
     #  sec_5 = sec_5.to_d
-      sec_6 = ((@ra**4)-((@ra-@t)**4))
-      sec_7 = ((8*@t)*(@ra**2)*((@ra-@t)**2)) / ( (9/2) * Pi * ((2*@ra)-@t) )
+      sec_6 = ((@ra** BigDecimal.new("4"))-((@ra-@t)** BigDecimal.new("4")))
+      sec_7 = (( BigDecimal.new("8")*@t)*(@ra** BigDecimal.new("2"))*((@ra-@t)** BigDecimal.new("2"))) / ( ( BigDecimal.new("9")/ BigDecimal.new("2")) * Pi * (( BigDecimal.new("2")*@ra)-@t) )
     #  sec_7 = sec_7.to_d
-      sec_8 = (Pi * @t * ((2*@ra)-@t))
-      sec_9 = ((c/2)-@ra)
-      sec_12 = 4 * ((@ra**3) - ((@ra-@t)**3))
-      sec_13 = 3 * Pi * ((@ra**2) - ((@ra-@t)**2))
+      sec_8 = (Pi * @t * (( BigDecimal.new("2")*@ra)-@t))
+      sec_9 = ((c/ BigDecimal.new("2"))-@ra)
+      sec_12 =  BigDecimal.new("4") * ((@ra** BigDecimal.new("3")) - ((@ra-@t)** BigDecimal.new("3")))
+      sec_13 =  BigDecimal.new("3") * Pi * ((@ra** BigDecimal.new("2")) - ((@ra-@t)** BigDecimal.new("2")))
       sec_11 = (sec_12 / sec_13)
-      sec_10 = ((sec_9 + sec_11)**2)
+      sec_10 = ((sec_9 + sec_11)** BigDecimal.new("2"))
 
       @i = sec_1 + (sec_2 * sec_3) + sec_4 + (sec_5 * sec_6) - sec_7 + (sec_8 * sec_10)
       return(@i)
@@ -449,10 +451,10 @@ FIXME: Check Math, guestimated most of it
 class Bar
   attr_accessor :x, :a, :i, :s, :r, :w
   
-  include Printers
+  include ShapeUtils
   
   def initialize(x)  
-    @x = x.to_d
+    @x = x.to_s.to_d
     
     @a = BigDecimal.new("0")
     @i = BigDecimal.new("0")
@@ -481,14 +483,65 @@ p @w.class
   end
 end
 
-#require "plate.rb"
+=begin
+
+Class Bar(x)
+
+FIXME: Check Math, guestimated most of it
+
+#  definition of variables
+#  x = bar dimension - x & y    
+
+=end
+class Plate
+  attr_accessor :x, :y, :a, :i_x, :i_y, :s_x, :s_y, :r_x, :r_y, :w
+  
+  include ShapeUtils
+  
+  def initialize(x, y)  
+    @x = x.to_s.to_d
+    @y = y.to_s.to_d
+    
+    @a = BigDecimal.new("0")
+    @i_x = BigDecimal.new("0")
+    @i_y = BigDecimal.new("0")
+    @s_x = BigDecimal.new("0")
+    @s_y = BigDecimal.new("0")
+    @r_x = BigDecimal.new("0")
+    @r_y = BigDecimal.new("0")
+    @w = BigDecimal.new("0")
+    
+
+    #calculate area
+    @a = @x * @y
+    
+    #calculate Second Moment of Inertia
+    @i_x = (@x * @y**3) / 12
+    @i_y = (@y * @x**3) / 12
+    
+    #calculate Section Modulus
+#    @s = (@x**3) / 6
+
+    #calculate Radius of Gyration
+#    @r = sqrt(@i / @a, 2)
+
+    #calculate weight per lin. foot
+    @w = (3.3996.to_d*@a)
+
+    #add caculated values to a hash
+    @hash = {"x" => @x.round(4).to_f, "a" => @a.round(4).to_f, "i_x" => @i_x.round(4).to_f, "i_y" => @i_y.round(4).to_f, "s_x" => @s_x.round(4).to_f, "s_y" => @s_y.round(4).to_f, "r_x" => @r_x.round(4).to_f, "r_y" => @r_y.round(4).to_f, "w" => @w.round(4).to_f }
+    @bighash = {"x" => @x, "a" => @a, "i_x" => @i_x, "i_y" => @i_y, "s_x" => @s_x, "s_y" => @s_y, "r_x" => @r_x, "r_y" => @r_y, "w" => @w }
+  end
+end
+
+
 #require "rod.rb"
 
-
-#  Round_tube.new(1.5, 0.75).hash
-
+=begin
+  Test objects one at a time
+=end
+#  Round_tube.new(1.5, 0.75).props
   Square_tube.new(3, 18, 0.0625).props
-
-#  Rec_tube.new(1.0, 3.0, 0.065, 0.005).test_shape
-
-#  Bar.new(5.0).prop
+#  Rec_tube.new(1.0, 3.0, 0.065, 0.005).props
+#  Bar.new(5.0).props
+#  Plate.new(4, 5).props
