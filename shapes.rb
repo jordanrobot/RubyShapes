@@ -9,27 +9,41 @@
 ### shared under the GNU GPLv3 ###
 ##################################
 
-    ADDED: add ability to use gauges as input arguments as well as decimal thicknesses
-            uses the Printer.gauge_converter method
-
-    TODO: add ability to covert tubing schedules to real dims.
-    FIXME: Fix rectangular tubing math (IT IS BROKEN) & verify
-
-    ADDED: let attributes be entered without trailing zeros & a decimal point
-    
-    TODO: Create method to automatically determine radius of corners based on ojbect args - use in calculations
-          involves caculating perimeter of tubing, use as a case to determine radius, set @ra
-          
-    TODO: Create method to check math and return a preliminary pass/fail
-      -Manually enter several accurate results (through range of sizes) w/ corresponding inputs
-      -Check that calculations == accurate results
-      -Give a prelim pass/fail based on results
-
+    TODO: create ShapeUtils::pipe_converter method, same as gauge_converter, based on schedule system
+    TODO: create 
+    TODO: Printers::gauge_converter - add 0ga, 00ga, 000ga, 0000ga
+    TODO: Rework Printers:gauge_converter so that it does not contain the if statement
+    TODO: create ShapeUtils::corner_radius method to automatically determine radius of corners
+          -method:
+            -calculate shape's perimeter (local var - perimeter) from @x & @y (or @d?)
+            -use a case table to find the radius that is correct for the thickness and perimeter
+            -save the result to the @ra variable
+          -remove ra variable from ShapeClass.new invocation 
+    TODO: 
+    TODO: Create testing method/module/mixin to verify math and return a pass/fail
+          -Manually enter several accurate results (through range of sizes) w/ corresponding inputs?
+          -Check that calculations == accurate results
+          -Give a prelim pass/fail based on results
     TODO: Add rod object with calculations (solid round shape)
     TODO: Add bar object with calculations (square v of plate)
     TODO: Add plate oject with calculations (rect. v of bar)
+    TODO: hand calculate some of the properties and see if the float values fudge accuracy
+    TODO: examine standardizing all return values from every class?
+          -this would allow several methods to move from Shape specific classes to the ShapeUtils module
+          -Hash, BigHash
+    TODO: Merge Rec_tubing and Square_tubing class?
+
+
+    FIXME: Rectangular tubing math is off just a little bit?
+            -precision in the millionths seems to be off - determine where it is failing
+            -seems to be affecting I, S, & R values (check others)
+    FIXME: Fix rectangular tubing math (IT IS BROKEN) & verify
     FIXME: Bar class returns odd I values to bar.props
     FIXME: Fix bar math & verify - only guestimates
+    
+
+    ADDED: add ability to use gauges as input arguments as well as decimal thicknesses uses the Printer.gauge_converter method
+    ADDED: let attributes be entered without trailing zeros & a decimal point
 
 Library Structure
 -----------------
@@ -153,6 +167,12 @@ module ShapeUtils
     end 
   end
   
+=begin
+  ==Printers::gauge_converter
+  This method examines the @t (thickness) variable to see if it is a decimal number or a gauge number.
+  @t > 1 are converted to the decimal number equivalents via a case statement.
+  @t < 1 are kept as is
+=end
   def gauge_converter
     if @t > 1 then
       case @t
@@ -192,7 +212,7 @@ module ShapeUtils
         @t = 0.300
       end
     if @t > 20
-      puts "Please enter an accurate thickness"
+      puts "Please enter an accurate thickness, either as a decimal number or as a gauge number"
       exit
     end
     @t = @t.to_s.to_d
@@ -485,7 +505,7 @@ end
 
 =begin
 
-Class Bar(x)
+Class Plate(x, y)
 
 FIXME: Check Math, guestimated most of it
 
