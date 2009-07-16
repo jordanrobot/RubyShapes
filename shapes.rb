@@ -3,7 +3,7 @@
 =begin
 
 ##################################
-###   Shapes Library v 0.2.1   ###
+###   Shapes Library v 0.2.1.1 ###
 ###     Matthew D. Jordan      ###
 ###    www.scenic-shop.com     ###
 ### shared under the GNU GPLv3 ###
@@ -49,7 +49,6 @@ Library Structure
 
 =end
 
-
 require 'bigdecimal'
 require 'bigdecimal/math'
 require 'bigdecimal/util'
@@ -58,14 +57,16 @@ include BigMath
 #Constants
 Pi = BigDecimal.PI(10)
 
-#==Printers
-#the methods in this class are solely used to 
-#consistently output the calculated shapes data
-#
-#All Shape classes inherit the Printer Class
+=begin
 
-class Printers
+==Printers
 
+this module consistently outputs the calculated shapes data
+
+note: all Shape classes mixin the Printer Class
+
+=end
+module Printers
     #prints rounded (4 places) attributes as floats.  Normally will print all attributes or those specified with obj.props("attribute")
   def props(arg="list")
     if arg == "list"
@@ -130,8 +131,7 @@ class Printers
     p self.bighash
   end
   
-end  
-
+end
 
 =begin
 
@@ -152,11 +152,11 @@ a round_rube object is part of the shape class
     @w - weight per foot
 
 =end
-
-class Round_tube < Printers
+class Round_tube
   attr_accessor :d, :t, :a, :i, :s, :r, :w
-#  attr_reader :d, :t, :a, :i, :s, :r, :w
   
+  include Printers
+
   def initialize(d, t)  
     @d = d.to_d
     @t = t.to_d
@@ -191,7 +191,6 @@ class Round_tube < Printers
 
 end
 
-
 =begin
 
 Class Square_tube(od, thickness, radius)
@@ -211,10 +210,10 @@ Class Square_tube(od, thickness, radius)
     @w - weight per foot
 
 =end
-
-class Square_tube < Printers
+class Square_tube
   attr_accessor :d, :ra, :t, :a, :i, :s, :r, :w
-#  attr_reader :d, :t, :a, :i, :s, :r, :w
+  
+  include Printers
 
   def initialize(d, t, ra)  
     @d = d.to_d
@@ -271,28 +270,23 @@ class Square_tube < Printers
   end
 end
 
-
 =begin
-
 Class Rec_tubing(d_x, d_y, ra, thick)
 
 WARNING - THE RECTANGULAR TUBING MATH IS NOT YET ACCURATE
 
-
-
-#  definition of variables
-#  d = box tube width, height
-#  ra = radius of corner
-#  t = wall thickness
+  definition of variables
+  d = box tube width, height
+  ra = radius of corner
+  t = wall thickness
 
 Methods      
 
 =end
-
-#declare class Variables
-class Rec_tube < Printers
+class Rec_tube
   attr_accessor :x, :y, :t, :ra, :a, :i_x, :i_y, :s_x, :s_y, :r_x, :r_y, :w
-#  attr_reader :x, :y, :t, :a, :i_x, :i_y, :s_x, :s_y, :r_x, :r_y, :w
+  
+  include Printers
   
   def initialize(x, y, t, ra)  
     @x = x.to_d
@@ -371,7 +365,6 @@ class Rec_tube < Printers
   end
 end
 
-
 =begin
 
 Class Bar(x)
@@ -382,11 +375,10 @@ FIXME: Check Math, guestimated most of it
 #  x = bar dimension - x & y    
 
 =end
-
-
-#Create square Bar class
-class Bar < Printers
+class Bar
   attr_accessor :x, :a, :i, :s, :r, :w
+  
+  include Printers
   
   def initialize(x)  
     @x = x.to_d
@@ -420,16 +412,11 @@ end
 #require "plate.rb"
 #require "rod.rb"
 
-#query all shape objects
 
-#  batten = Round_tube.new(1.5, 0.75)
-#  batten.columns
+p  Round_tube.new(1.5, 0.75).hash
 
-#  box = Square_tube.new(3.0, 0.125, 0.005)
-#  box.test_shape
+#  Square_tube.new(3.0, 0.125, 0.005).props
 
-#  beam = Rec_tube.new(1.0, 3.0, 0.065, 0.005)
-#  beam.test_shape
+#  Rec_tube.new(1.0, 3.0, 0.065, 0.005).test_shape
 
-  beam = Bar.new(5.0)
-  beam.test_shape
+#  Bar.new(5.0).test_shape
