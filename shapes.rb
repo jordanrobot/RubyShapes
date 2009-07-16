@@ -1,7 +1,34 @@
+#!/usr/bin/env ruby
+
 =begin
 
-Shapes Library Version 0.2.0
+##################################
+###   Shapes Library v 0.2.1   ###
+###     Matthew D. Jordan      ###
+###    www.scenic-shop.com     ###
+### shared under the GNU GPLv3 ###
+##################################
 
+    FIXME: Fix rectangular tubing math (IT IS BROKEN) & verify
+    FIXME: Verify square tubing math & fix if broken
+
+    TODO: add ability to use gauges as input arguments as well as decimal thicknesses
+    FIXME: let attributes be entered without leading and trailing zeros & a decimal point
+    
+    TODO: Create method to automatically determine radius of corners based on ojbect args - use in calculations
+    TODO: Create method to check math and return a preliminary pass/fail
+      -Manually enter several accurate results (through range of sizes) w/ corresponding inputs
+      -Check that calculations == accurate results
+      -Give a prelim pass/fail based on results
+
+    TODO: Add rod object with calculations (solid round shape)
+    TODO: Add bar object with calculations (square v of plate)
+    TODO: Add plate oject with calculations (rect. v of bar)
+    FIXME: Bar class returns odd I values to bar.props
+    FIXME: Fix bar math & verify - only guestimates
+
+Library Structure
+-----------------
   each shape object (cross section to analyze) will be an instance of that shape's class
   Class Round_tube(od, thickness)
     .initialize
@@ -28,20 +55,27 @@ require 'bigdecimal/math'
 require 'bigdecimal/util'
 include BigMath
 
-#declare Constants
+#Constants
 Pi = BigDecimal.PI(10)
+
+#==Printers
+#the methods in this class are solely used to 
+#consistently output the calculated shapes data
+#
+#All Shape classes inherit the Printer Class
 
 class Printers
 
+    #prints rounded (4 places) attributes as floats.  Normally will print all attributes or those specified with obj.props("attribute")
   def props(arg="list")
-    #print rounded truncated values
     if arg == "list"
       @hash.each {|key, value| puts "#{key}:  #{value}\n"}
     else
       puts @hash["#{arg}"]
     end
   end
-  
+
+  #prints the complete attributes as bigdecimals.   Normally will print all attributes or those specified with obj.bigprops("attribute")
   def bigprops(arg='i')
     if arg == 'i'
       @bighash.each {|key, value| puts "#{key}:  #{value}\n"}
@@ -50,20 +84,22 @@ class Printers
     end
   end  
   
+  #returns a hash of the attributes (rounded to 4 places, as floats.)
   def hash
     @hash
   end
-  
+
+  #returns a hash of the attributes (as bigdecimals.)  
   def bighash
      @bighash
   end
   
-# TODO: FIX the column method
+  # FIXME: fix the column method, collapse into an orderly single line
   def columns
         @hash.each {|key, value| p "#{value}"}
   end
   
-  #test shape objects
+  #test individual shape objects and return results
   def test_shape
     puts 'Return all values in the object (Floats):'
     self.props
@@ -93,9 +129,8 @@ class Printers
     puts 'Return all values in the object (BigDecimal Hash):'
     p self.bighash
   end
+  
 end  
-
-
 
 
 =begin
@@ -111,7 +146,7 @@ a round_rube object is part of the shape class
 
   calculates 5 instance variables from the input args
     @a - sq. area
-    @i - static moment of inertia
+    @i - second Second Moment of Inertia
     @s - section modulus
     @r - radius of gyration
     @w - weight per foot
@@ -120,7 +155,7 @@ a round_rube object is part of the shape class
 
 class Round_tube < Printers
   attr_accessor :d, :t, :a, :i, :s, :r, :w
-  attr_reader :d, :t, :a, :i, :s, :r, :w
+#  attr_reader :d, :t, :a, :i, :s, :r, :w
   
   def initialize(d, t)  
     @d = d.to_d
@@ -136,7 +171,7 @@ class Round_tube < Printers
     #calculate Round tube Area
      @a = (Pi*@t) * (@d-@t)
 
-     #Calculate Round Tube Moment of Inertia   
+     #Calculate Round Tube Second Moment of Inertia   
      @i = Pi * (@d**4 - ((@d - (2*@t))**4 ))/64
 
      #Calculate Round Tube Section Modulus
@@ -151,6 +186,7 @@ class Round_tube < Printers
      #add caculated values to a hash
      @hash = {"d" => @d.round(4).to_f, "t" => @t.round(4).to_f, "a" => @a.round(4).to_f, "i" => @i.round(4).to_f, "s" => @s.round(4).to_f, "r" => @r.round(4).to_f, "w" => @w.round(4).to_f }
      @bighash = {"d" => @d, "t" => @t, "a" => @a, "i" => @i, "s" => @s, "r" => @r, "w" => @w }
+     return "#{self} created" 
   end 
 
 end
@@ -169,7 +205,7 @@ Class Square_tube(od, thickness, radius)
 
   calculates 5 instance variables from the input args
     @a - sq. area
-    @i - static moment of inertia
+    @i - static Second Moment of Inertia
     @s - section modulus
     @r - radius of gyration
     @w - weight per foot
@@ -178,7 +214,7 @@ Class Square_tube(od, thickness, radius)
 
 class Square_tube < Printers
   attr_accessor :d, :ra, :t, :a, :i, :s, :r, :w
-  attr_reader :d, :t, :a, :i, :s, :r, :w
+#  attr_reader :d, :t, :a, :i, :s, :r, :w
 
   def initialize(d, t, ra)  
     @d = d.to_d
@@ -238,42 +274,25 @@ end
 
 =begin
 
-Class Rec_tubing(d_x, d_y)
+Class Rec_tubing(d_x, d_y, ra, thick)
+
+WARNING - THE RECTANGULAR TUBING MATH IS NOT YET ACCURATE
+
+
 
 #  definition of variables
 #  d = box tube width, height
 #  ra = radius of corner
 #  t = wall thickness
 
+Methods      
+
 =end
 
 #declare class Variables
 class Rec_tube < Printers
   attr_accessor :x, :y, :t, :ra, :a, :i_x, :i_y, :s_x, :s_y, :r_x, :r_y, :w
-  attr_reader :x, :y, :t, :a, :i_x, :i_y, :s_x, :s_y, :r_x, :r_y, :w
-
-  #method - calculate Moment of Inertia
-  def calc_i(c, b)
-    sec_1 = ( (@t**3) * (b - (2*@ra) ) )/6
-    sec_2 = 2*@t*(b-(2*@ra))
-    sec_3 = ((c-@t)/2)**2
-    sec_4 = (@t*(  (c-(2*@ra))**3))/6
-    sec_5 = (Pi/4)-(8/((9/2)*Pi))
-  #  sec_5 = sec_5.to_d
-    sec_6 = ((@ra**4)-((@ra-@t)**4))
-    sec_7 = ((8*@t)*(@ra**2)*((@ra-@t)**2)) / ( (9/2) * Pi * ((2*@ra)-@t) )
-  #  sec_7 = sec_7.to_d
-    sec_8 = (Pi * @t * ((2*@ra)-@t))
-    sec_9 = ((c/2)-@ra)
-    sec_12 = 4 * ((@ra**3) - ((@ra-@t)**3))
-    sec_13 = 3 * Pi * ((@ra**2) - ((@ra-@t)**2))
-    sec_11 = (sec_12 / sec_13)
-    sec_10 = ((sec_9 + sec_11)**2)
-  
-    @i = sec_1 + (sec_2 * sec_3) + sec_4 + (sec_5 * sec_6) - sec_7 + (sec_8 * sec_10)
-    return(@i)
-  end
-
+#  attr_reader :x, :y, :t, :a, :i_x, :i_y, :s_x, :s_y, :r_x, :r_y, :w
   
   def initialize(x, y, t, ra)  
     @x = x.to_d
@@ -293,8 +312,30 @@ class Rec_tube < Printers
     
     #----------calculate area----------
     @a = (@t*((2*(@x+@y))-(8*@ra)+(Pi*((2*@ra)-@t))))
+
+    #method - calculate Second Moment of Inertia
+    def calc_i(c, b)
+      sec_1 = ( (@t**3) * (b - (2*@ra) ) )/6
+      sec_2 = 2*@t*(b-(2*@ra))
+      sec_3 = ((c-@t)/2)**2
+      sec_4 = (@t*(  (c-(2*@ra))**3))/6
+      sec_5 = (Pi/4)-(8/((9/2)*Pi))
+    #  sec_5 = sec_5.to_d
+      sec_6 = ((@ra**4)-((@ra-@t)**4))
+      sec_7 = ((8*@t)*(@ra**2)*((@ra-@t)**2)) / ( (9/2) * Pi * ((2*@ra)-@t) )
+    #  sec_7 = sec_7.to_d
+      sec_8 = (Pi * @t * ((2*@ra)-@t))
+      sec_9 = ((c/2)-@ra)
+      sec_12 = 4 * ((@ra**3) - ((@ra-@t)**3))
+      sec_13 = 3 * Pi * ((@ra**2) - ((@ra-@t)**2))
+      sec_11 = (sec_12 / sec_13)
+      sec_10 = ((sec_9 + sec_11)**2)
+
+      @i = sec_1 + (sec_2 * sec_3) + sec_4 + (sec_5 * sec_6) - sec_7 + (sec_8 * sec_10)
+      return(@i)
+    end
     
-    #call calculate Moment of Inertia method
+    #call calculate Second Moment of Inertia method
     @i_x = calc_i(@y, @x)
     @i_y = calc_i(@x, @y)
     
@@ -330,15 +371,65 @@ class Rec_tube < Printers
   end
 end
 
-#require "bar.rb"
+
+=begin
+
+Class Bar(x)
+
+FIXME: Check Math, guestimated most of it
+
+#  definition of variables
+#  x = bar dimension - x & y    
+
+=end
+
+
+#Create square Bar class
+class Bar < Printers
+  attr_accessor :x, :a, :i, :s, :r, :w
+  
+  def initialize(x)  
+    @x = x.to_d
+    
+    @a = BigDecimal.new("0")
+    @i = BigDecimal.new("0")
+    @s = BigDecimal.new("0")
+    @r = BigDecimal.new("0")
+    @w = BigDecimal.new("0")
+    
+    #calculate area
+    @a = @x * @x
+    
+    #calculate Second Moment of Inertia
+    @i = (@x**4) / 12
+
+    #calculate Section Modulus
+    @s = (@x**3) / 6
+
+    #calculate Radius of Gyration
+    @r = sqrt(@i / @a, 2)
+    
+    #calculate weight per lin. foot
+
+    #add caculated values to a hash
+    @hash = {"x" => @x.round(4).to_f, "a" => @a.round(4).to_f, "i" => @i.round(4).to_f, "s" => @s.round(4).to_f, "r" => @r.round(4).to_f, "w" => @w.round(4).to_f }
+    @bighash = {"x" => @x, "a" => @a, "i" => @i, "s" => @s, "r" => @r, "w" => @w }
+  end
+end
+
 #require "plate.rb"
+#require "rod.rb"
 
+#query all shape objects
 
-batten = Round_tube.new(1.5, 0.75)
-batten.columns
+#  batten = Round_tube.new(1.5, 0.75)
+#  batten.columns
 
-box = Square_tube.new(3.0, 0.125, 0.005)
-box.test_shape
+#  box = Square_tube.new(3.0, 0.125, 0.005)
+#  box.test_shape
 
-beam = Rec_tube.new(1.0, 3.0, 0.065, 0.005)
-beam.test_shape
+#  beam = Rec_tube.new(1.0, 3.0, 0.065, 0.005)
+#  beam.test_shape
+
+  beam = Bar.new(5.0)
+  beam.test_shape
