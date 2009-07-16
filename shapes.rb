@@ -3,7 +3,7 @@
 =begin
 
 ##################################
-###   Shapes Library v 0.2.1.1 ###
+###   Shapes Library v 0.2.2   ###
 ###     Matthew D. Jordan      ###
 ###    www.scenic-shop.com     ###
 ### shared under the GNU GPLv3 ###
@@ -130,7 +130,64 @@ module Printers
     puts 'Return all values in the object (BigDecimal Hash):'
     p self.bighash
   end
+
+  class Float 
+    def big
+      BigDecimal(self.to_s)
+    end 
+  end
+
   
+  def gauge_converter
+    if @t > 0.75 then
+      @t = case @t
+      when 20 then 0.035
+      when 18 then 0.049
+      when 16 then 0.065
+      when 14 then 0.083
+      when 13 then 0.095
+      when 12 then 0.109
+      when 11 then 0.120
+      when 10 then 0.134
+      when 9 then 0.148
+      when 8 then 0.165
+      when 7 then 0.180
+      when 6 then 0.203
+      when 5 then 0.220
+      when 4 then 0.238
+      when 3 then 0.259
+      when 2 then 0.284
+      when 1 then 0.300
+      end
+    end
+    
+  end
+    
+# def gauge converter
+     # if @t >= 0.75 then
+  #      @t = case t
+  #      when 20 then BigDecimal.new("0.035")
+  #      when 18 then BigDecimal.new("0.049")
+  #      when 16 then BigDecimal.new("0.065")
+  #      when 14 then BigDecimal.new("0.083")
+  #      when 13 then BigDecimal.new("0.095")
+  #      when 12 then BigDecimal.new("0.109")
+  #      when 11 then BigDecimal.new("0.120")
+  #      when 10 then BigDecimal.new("0.134")
+  #      when 9 then BigDecimal.new("0.148")
+  #      when 8 then BigDecimal.new("0.165")
+  #      when 7 then BigDecimal.new("0.180")
+  #      when 6 then BigDecimal.new("0.203")
+  #      when 5 then BigDecimal.new("0.220")
+  #      when 4 then BigDecimal.new("0.238")
+  #      when 3 then BigDecimal.new("0.259")
+  #      when 2 then BigDecimal.new("0.284")
+  #      when 1 then BigDecimal.new("0.300")
+    #      end
+
+    #  end
+ 
+
 end
 
 =begin
@@ -216,10 +273,14 @@ class Square_tube
   include Printers
 
   def initialize(d, t, ra)  
+
+
     @d = d.to_d
     @t = t.to_d
-    @ra = d.to_d
+    @ra = ra.to_d
 
+gauge_converter
+    
     #declare class Variables
     @a = BigDecimal.new("0")
     @i = BigDecimal.new("0")
@@ -229,7 +290,6 @@ class Square_tube
 
     #calculate Square Area
     @a = (@t * ((4 * @d) - (8 * @ra) + ( Pi * (2*@ra - @t) ) ))
-
 
     #calculate Moment of I
     temp = BigDecimal.new("0")
@@ -251,17 +311,19 @@ class Square_tube
     c = ((@d/2) - @ra + (@w/x))**2
     temp2 = b * c
     
-    temp = temp + temp2
-    @i = temp
+    @i = temp + temp2
     
     #Section Modulus
     @s = ((2 * @i)/@d)
     
     #Radius of Gyration
-    @r = sqrt(@i/@a, 9)
+    @r = sqrt((@i/@a))
     
     #Weight / ft.
     @w = (3.3996.to_d*@a)
+
+
+#    @hash = {"d" => @d.round(4).to_f, "t" => @t.round(4).to_f, "a" => @a.round(4).to_f, "i" => @i.round(4).to_f, "s" => @s.round(4).to_f, "r" => @r.round(4).to_s, "w" => @w.round(4).to_s }
 
     #add caculated values to a hash
     @hash = {"d" => @d.round(4).to_f, "t" => @t.round(4).to_f, "a" => @a.round(4).to_f, "i" => @i.round(4).to_f, "s" => @s.round(4).to_f, "r" => @r.round(4).to_f, "w" => @w.round(4).to_f }
@@ -388,21 +450,22 @@ class Bar
     @s = BigDecimal.new("0")
     @r = BigDecimal.new("0")
     @w = BigDecimal.new("0")
-    
+
     #calculate area
     @a = @x * @x
-    
+p @a.class    
     #calculate Second Moment of Inertia
     @i = (@x**4) / 12
-
+p @i.class
     #calculate Section Modulus
     @s = (@x**3) / 6
-
+p @s.class
     #calculate Radius of Gyration
     @r = sqrt(@i / @a, 2)
-    
+p @r.class    
     #calculate weight per lin. foot
-
+    @w = (3.3996.to_d*@a)
+p @w.class
     #add caculated values to a hash
     @hash = {"x" => @x.round(4).to_f, "a" => @a.round(4).to_f, "i" => @i.round(4).to_f, "s" => @s.round(4).to_f, "r" => @r.round(4).to_f, "w" => @w.round(4).to_f }
     @bighash = {"x" => @x, "a" => @a, "i" => @i, "s" => @s, "r" => @r, "w" => @w }
@@ -413,10 +476,10 @@ end
 #require "rod.rb"
 
 
-p  Round_tube.new(1.5, 0.75).hash
+#  Round_tube.new(1.5, 0.75).hash
 
-#  Square_tube.new(3.0, 0.125, 0.005).props
+  Square_tube.new(3.0, 18.0, 0.0625).props
 
 #  Rec_tube.new(1.0, 3.0, 0.065, 0.005).test_shape
 
-#  Bar.new(5.0).test_shape
+#  Bar.new(5.0).props
