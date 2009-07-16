@@ -3,19 +3,23 @@
 =begin
 
 ##################################
-###   Shapes Library v 0.2.2   ###
+###   Shapes Library v 0.2.3   ###
 ###     Matthew D. Jordan      ###
 ###    www.scenic-shop.com     ###
 ### shared under the GNU GPLv3 ###
 ##################################
 
-    FIXME: Fix rectangular tubing math (IT IS BROKEN) & verify
-    FIXME: Verify square tubing math & fix if broken
+    ADDED: add ability to use gauges as input arguments as well as decimal thicknesses
+            uses the Printer.gauge_converter method
 
-    TODO: add ability to use gauges as input arguments as well as decimal thicknesses
-    FIXME: let attributes be entered without leading and trailing zeros & a decimal point
+    TODO: add ability to covert tubing schedules to real dims.
+    FIXME: Fix rectangular tubing math (IT IS BROKEN) & verify
+
+    ADDED: let attributes be entered without trailing zeros & a decimal point
     
     TODO: Create method to automatically determine radius of corners based on ojbect args - use in calculations
+          involves caculating perimeter of tubing, use as a case to determine radius, set @ra
+          
     TODO: Create method to check math and return a preliminary pass/fail
       -Manually enter several accurate results (through range of sizes) w/ corresponding inputs
       -Check that calculations == accurate results
@@ -48,14 +52,14 @@ Library Structure
     .test_object
 
 =end
-
+#require 'profile'
 require 'bigdecimal'
 require 'bigdecimal/math'
 require 'bigdecimal/util'
 include BigMath
 
 #Constants
-Pi = BigDecimal.PI(10)
+Pi = BigDecimal.PI(20)
 
 =begin
 
@@ -131,62 +135,67 @@ module Printers
     p self.bighash
   end
 
+  def test
+    p "a:  #{@a.class}"
+    p "i:  #{@i.class}"
+    p "s:  #{@s.class}"
+    p "r:  #{@r.class}"
+    p "w:  #{@w.class}"
+    p "Pi: #{Pi.class}"
+    p "t:  #{@t.class}"
+  end
+
   class Float 
     def big
       BigDecimal(self.to_s)
     end 
   end
-
   
   def gauge_converter
-    if @t > 0.75 then
-      @t = case @t
-      when 20 then 0.035
-      when 18 then 0.049
-      when 16 then 0.065
-      when 14 then 0.083
-      when 13 then 0.095
-      when 12 then 0.109
-      when 11 then 0.120
-      when 10 then 0.134
-      when 9 then 0.148
-      when 8 then 0.165
-      when 7 then 0.180
-      when 6 then 0.203
-      when 5 then 0.220
-      when 4 then 0.238
-      when 3 then 0.259
-      when 2 then 0.284
-      when 1 then 0.300
+    if @t > 1 then
+      case @t
+      when 20
+        @t = 0.035
+      when 18
+        @t = 0.049
+      when 16
+        @t = 0.065
+      when 14
+        @t = 0.083
+      when 13
+        @t = 0.095
+      when 12
+        @t = 0.109
+      when 11
+        @t = 0.120
+      when 10
+        @t = 0.134
+      when 9
+        @t = 0.148
+      when 8
+        @t = 0.165
+      when 7
+        @t = 0.180
+      when 6
+        @t = 0.203
+      when 5
+        @t = 0.220
+      when 4
+        @t = 0.238
+      when 3
+        @t = 0.259
+      when 2
+        @t = 0.284
+      when 1
+        @t = 0.300
       end
+    if @t > 20
+      puts "Please enter an accurate thickness"
+      exit
     end
-    
+    @t = @t.to_s.to_d
+    end
   end
-    
-# def gauge converter
-     # if @t >= 0.75 then
-  #      @t = case t
-  #      when 20 then BigDecimal.new("0.035")
-  #      when 18 then BigDecimal.new("0.049")
-  #      when 16 then BigDecimal.new("0.065")
-  #      when 14 then BigDecimal.new("0.083")
-  #      when 13 then BigDecimal.new("0.095")
-  #      when 12 then BigDecimal.new("0.109")
-  #      when 11 then BigDecimal.new("0.120")
-  #      when 10 then BigDecimal.new("0.134")
-  #      when 9 then BigDecimal.new("0.148")
-  #      when 8 then BigDecimal.new("0.165")
-  #      when 7 then BigDecimal.new("0.180")
-  #      when 6 then BigDecimal.new("0.203")
-  #      when 5 then BigDecimal.new("0.220")
-  #      when 4 then BigDecimal.new("0.238")
-  #      when 3 then BigDecimal.new("0.259")
-  #      when 2 then BigDecimal.new("0.284")
-  #      when 1 then BigDecimal.new("0.300")
-    #      end
-
-    #  end
- 
 
 end
 
@@ -275,11 +284,11 @@ class Square_tube
   def initialize(d, t, ra)  
 
 
-    @d = d.to_d
-    @t = t.to_d
-    @ra = ra.to_d
-
-gauge_converter
+    @d = d.to_s.to_d
+    @t = t.to_s.to_d
+    @ra = ra.to_s.to_d
+    
+    gauge_converter
     
     #declare class Variables
     @a = BigDecimal.new("0")
@@ -287,7 +296,7 @@ gauge_converter
     @s = BigDecimal.new("0")
     @r = BigDecimal.new("0")
     @w = BigDecimal.new("0")
-
+test
     #calculate Square Area
     @a = (@t * ((4 * @d) - (8 * @ra) + ( Pi * (2*@ra - @t) ) ))
 
@@ -317,7 +326,7 @@ gauge_converter
     @s = ((2 * @i)/@d)
     
     #Radius of Gyration
-    @r = sqrt((@i/@a))
+    @r = (@i/@a).sqrt(10)
     
     #Weight / ft.
     @w = (3.3996.to_d*@a)
@@ -478,8 +487,8 @@ end
 
 #  Round_tube.new(1.5, 0.75).hash
 
-  Square_tube.new(3.0, 18.0, 0.0625).props
+  Square_tube.new(3, 18, 0.0625).props
 
 #  Rec_tube.new(1.0, 3.0, 0.065, 0.005).test_shape
 
-#  Bar.new(5.0).props
+#  Bar.new(5.0).prop
