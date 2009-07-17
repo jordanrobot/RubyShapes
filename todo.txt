@@ -32,8 +32,10 @@
   FIXME: Fix bar math & verify - only guestimates
 
 == Version History ==
+v 0.2.5.4 - current
+    ADDED: Added round bar stuff - math has not been verified
 
-v 0.2.5.3 - Current
+v 0.2.5.3
     ADDED: new file - todo.txt (this file) - migrated contents from shapes.rb
     ADDED: more values to gauge_converter. Now includes 0000ga. through 30ga.
     RENAMED: ShapeUtils::test_vars to ShapeUtils::var_classes

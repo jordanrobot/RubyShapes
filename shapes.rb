@@ -2,7 +2,7 @@
 =begin
 
 ###################################
-###   Shapes Library v 0.2.5.3  ###
+###   Shapes Library v 0.2.5.4  ###
 ###     Matthew D. Jordan       ###
 ###    www.scenic-shop.com      ###
 ### shared under the GNU GPLv3  ###
@@ -630,7 +630,41 @@ Class Rod(d)
 
 =end
 class Rod
-#Brand new class - fill in with stuff!
+  attr_accessor :x, :a, :i, :s, :r, :w
+  
+  include ShapeUtils
+  
+  def initialize(x)
+
+     @x = x.to_s.to_d
+     
+     @a = BigDecimal.new("0")
+     @i = BigDecimal.new("0")
+     @s = BigDecimal.new("0")
+     @r = BigDecimal.new("0")
+     @w = BigDecimal.new("0")
+    
+     #calculate area
+     @a = Pi * (@x / 2)**2 
+    
+     #calculate Second Moment of Inertia
+     @i = (Pi/64)*(x**4)
+    
+     #calculate Section Modulus
+     @s = Pi * @x ** 3 /32
+    
+     #calculate Radius of Gyration
+     @r = sqrt(@i / @a, 2)
+    
+     #calculate weight per lin. foot
+     @w = (3.3996.to_d*@a)
+    
+     #add caculated values to a hash
+     @hash = {"x" => @x.round(4).to_f, "a" => @a.round(4).to_f, "i" => @i.round(4).to_f, "s" => @s.round(4).to_f, "r" => @r.round(4).to_f, "w" => @w.round(4).to_f }
+     @bighash = {"x" => @x, "a" => @a, "i" => @i, "s" => @s, "r" => @r, "w" => @w }
+
+  end #def
+
 end
 
 ########################
@@ -639,6 +673,7 @@ end
 
 #  Round_tube.new(1.5, 0.75).props
 #  Square_tube.new(3, 13, 0.0625).props
-  Rec_tube.new(1.0, 3.0, 0.065, 0.005).props
+#  Rec_tube.new(1.0, 3.0, 0.065, 0.005).props
 #  Bar.new(5.0).props
 #  Plate.new(4, 5).props
+  Rod.new(2).props
