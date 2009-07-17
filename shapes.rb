@@ -2,12 +2,12 @@
 
 =begin
 
-##################################
-###   Shapes Library v 0.2.5   ###
-###     Matthew D. Jordan      ###
-###    www.scenic-shop.com     ###
-### shared under the GNU GPLv3 ###
-##################################
+###################################
+###   Shapes Library v 0.2.5.2  ###
+###     Matthew D. Jordan       ###
+###    www.scenic-shop.com      ###
+### shared under the GNU GPLv3  ###
+###################################
 
     TODO: create ShapeUtils::pipe_converter method, same as gauge_converter, based on schedule system
     TODO: create 
@@ -400,7 +400,7 @@ class Rec_tube
   
   include ShapeUtils
   
-#  private
+  private
   
   def initialize(x, y, t, ra)  
     
