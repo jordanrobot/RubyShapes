@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (Round_tube)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File /Users/ra/Sandbox/git/shapes/shapes.rb, line 248</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">d</span>, <span class="ruby-identifier">t</span>)  
+    <span class="ruby-ivar">@d</span> = <span class="ruby-identifier">d</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">to_d</span>
+    <span class="ruby-ivar">@t</span> = <span class="ruby-identifier">t</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">to_d</span>
+
+    <span class="ruby-comment cmt">#declare class Variables</span>
+    <span class="ruby-ivar">@a</span> = <span class="ruby-constant">BigDecimal</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value str">&quot;0&quot;</span>)
+    <span class="ruby-ivar">@i</span> = <span class="ruby-constant">BigDecimal</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value str">&quot;0&quot;</span>)
+    <span class="ruby-ivar">@s</span> = <span class="ruby-constant">BigDecimal</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value str">&quot;0&quot;</span>)
+    <span class="ruby-ivar">@r</span> = <span class="ruby-constant">BigDecimal</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value str">&quot;0&quot;</span>)
+    <span class="ruby-ivar">@w</span> = <span class="ruby-constant">BigDecimal</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value str">&quot;0&quot;</span>)
+
+    <span class="ruby-comment cmt">#calculate Round tube Area</span>
+     <span class="ruby-ivar">@a</span> = (<span class="ruby-constant">Pi</span><span class="ruby-operator">*</span><span class="ruby-ivar">@t</span>) <span class="ruby-operator">*</span> (<span class="ruby-ivar">@d</span><span class="ruby-operator">-</span><span class="ruby-ivar">@t</span>)
+
+     <span class="ruby-comment cmt">#Calculate Round Tube Second Moment of Inertia   </span>
+     <span class="ruby-ivar">@i</span> = <span class="ruby-constant">Pi</span> <span class="ruby-operator">*</span> (<span class="ruby-ivar">@d</span><span class="ruby-operator">**</span><span class="ruby-value">4</span> <span class="ruby-operator">-</span> ((<span class="ruby-ivar">@d</span> <span class="ruby-operator">-</span> (<span class="ruby-value">2</span><span class="ruby-operator">*</span><span class="ruby-ivar">@t</span>))<span class="ruby-operator">**</span><span class="ruby-value">4</span> ))<span class="ruby-operator">/</span><span class="ruby-value">64</span>
+
+     <span class="ruby-comment cmt">#Calculate Round Tube Section Modulus</span>
+     <span class="ruby-ivar">@s</span> = (<span class="ruby-value">2</span><span class="ruby-operator">*</span><span class="ruby-ivar">@i</span>)<span class="ruby-operator">/</span><span class="ruby-ivar">@d</span>
+
+     <span class="ruby-comment cmt">#Calculate Round Tube Radius of Gyration </span>
+     <span class="ruby-ivar">@r</span> = <span class="ruby-identifier">sqrt</span>(<span class="ruby-ivar">@i</span><span class="ruby-operator">/</span><span class="ruby-ivar">@a</span>, <span class="ruby-value">9</span>)
+
+     <span class="ruby-comment cmt">#Calculate Round Tube Weight</span>
+     <span class="ruby-ivar">@w</span> = (<span class="ruby-constant">BigDecimal</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value str">&quot;3.3996&quot;</span>)<span class="ruby-operator">*</span><span class="ruby-ivar">@a</span>)
+
+     <span class="ruby-comment cmt">#add caculated values to a hash</span>
+     <span class="ruby-ivar">@hash</span> = {<span class="ruby-value str">&quot;d&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@d</span>.<span class="ruby-identifier">round</span>(<span class="ruby-value">4</span>).<span class="ruby-identifier">to_f</span>, <span class="ruby-value str">&quot;t&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@t</span>.<span class="ruby-identifier">round</span>(<span class="ruby-value">4</span>).<span class="ruby-identifier">to_f</span>, <span class="ruby-value str">&quot;a&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@a</span>.<span class="ruby-identifier">round</span>(<span class="ruby-value">4</span>).<span class="ruby-identifier">to_f</span>, <span class="ruby-value str">&quot;i&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@i</span>.<span class="ruby-identifier">round</span>(<span class="ruby-value">4</span>).<span class="ruby-identifier">to_f</span>, <span class="ruby-value str">&quot;s&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@s</span>.<span class="ruby-identifier">round</span>(<span class="ruby-value">4</span>).<span class="ruby-identifier">to_f</span>, <span class="ruby-value str">&quot;r&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@r</span>.<span class="ruby-identifier">round</span>(<span class="ruby-value">4</span>).<span class="ruby-identifier">to_f</span>, <span class="ruby-value str">&quot;w&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@w</span>.<span class="ruby-identifier">round</span>(<span class="ruby-value">4</span>).<span class="ruby-identifier">to_f</span> }
+     <span class="ruby-ivar">@bighash</span> = {<span class="ruby-value str">&quot;d&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@d</span>, <span class="ruby-value str">&quot;t&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@t</span>, <span class="ruby-value str">&quot;a&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@a</span>, <span class="ruby-value str">&quot;i&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@i</span>, <span class="ruby-value str">&quot;s&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@s</span>, <span class="ruby-value str">&quot;r&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@r</span>, <span class="ruby-value str">&quot;w&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@w</span> }
+     <span class="ruby-keyword kw">return</span> <span class="ruby-node">&quot;#{self} created&quot;</span> 
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>gauge_converter (ShapeUtils)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File /Users/ra/Sandbox/git/shapes/shapes.rb, line 176</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">gauge_converter</span>
+    <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@t</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-keyword kw">case</span> <span class="ruby-ivar">@t</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-value">20</span>
+        <span class="ruby-ivar">@t</span> = <span class="ruby-value">0</span><span class="ruby-value">.035</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-value">18</span>
+        <span class="ruby-ivar">@t</span> = <span class="ruby-value">0</span><span class="ruby-value">.049</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-value">16</span>
+        <span class="ruby-ivar">@t</span> = <span class="ruby-value">0</span><span class="ruby-value">.065</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-value">14</span>
+        <span class="ruby-ivar">@t</span> = <span class="ruby-value">0</span><span class="ruby-value">.083</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-value">13</span>
+        <span class="ruby-ivar">@t</span> = <span class="ruby-value">0</span><span class="ruby-value">.095</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-value">12</span>
+        <span class="ruby-ivar">@t</span> = <span class="ruby-value">0</span><span class="ruby-value">.109</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-value">11</span>
+        <span class="ruby-ivar">@t</span> = <span class="ruby-value">0</span><span class="ruby-value">.120</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-value">10</span>
+        <span class="ruby-ivar">@t</span> = <span class="ruby-value">0</span><span class="ruby-value">.134</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-value">9</span>
+        <span class="ruby-ivar">@t</span> = <span class="ruby-value">0</span><span class="ruby-value">.148</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-value">8</span>
+        <span class="ruby-ivar">@t</span> = <span class="ruby-value">0</span><span class="ruby-value">.165</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-value">7</span>
+        <span class="ruby-ivar">@t</span> = <span class="ruby-value">0</span><span class="ruby-value">.180</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-value">6</span>
+        <span class="ruby-ivar">@t</span> = <span class="ruby-value">0</span><span class="ruby-value">.203</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-value">5</span>
+        <span class="ruby-ivar">@t</span> = <span class="ruby-value">0</span><span class="ruby-value">.220</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-value">4</span>
+        <span class="ruby-ivar">@t</span> = <span class="ruby-value">0</span><span class="ruby-value">.238</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-value">3</span>
+        <span class="ruby-ivar">@t</span> = <span class="ruby-value">0</span><span class="ruby-value">.259</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-value">2</span>
+        <span class="ruby-ivar">@t</span> = <span class="ruby-value">0</span><span class="ruby-value">.284</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-value">1</span>
+        <span class="ruby-ivar">@t</span> = <span class="ruby-value">0</span><span class="ruby-value">.300</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@t</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">20</span>
+      <span class="ruby-identifier">puts</span> <span class="ruby-value str">&quot;Please enter an accurate thickness, either as a decimal number or as a gauge number&quot;</span>
+      <span class="ruby-identifier">exit</span>
+    <span class="ruby-keyword kw">end</span>
+    <span class="ruby-ivar">@t</span> = <span class="ruby-ivar">@t</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">to_d</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

@@ -3,7 +3,7 @@
 =begin
 
 ##################################
-###   Shapes Library v 0.2.3   ###
+###   Shapes Library v 0.2.5   ###
 ###     Matthew D. Jordan      ###
 ###    www.scenic-shop.com     ###
 ### shared under the GNU GPLv3 ###
@@ -70,7 +70,7 @@ Library Structure
     .gauge_converter
 
 =end
-require 'profile'
+#require 'profile'
 require 'bigdecimal'
 require 'bigdecimal/math'
 require 'bigdecimal/util'
@@ -79,12 +79,17 @@ include BigMath
 #Constants
 Pi = BigDecimal.PI(20)
 
+
+#############################
+###   ShapeUtils Module   ###
+#############################
+
 =begin
 
   ==ShapeUtils
   this module handles i/o of the calculated shape values
   note: all Shape classes mixin this ShapeUtils Class
-  
+
 =end
 module ShapeUtils
     #prints rounded (4 places) attributes as floats.  Normally will print all attributes or those specified with obj.props("attribute")
@@ -152,13 +157,22 @@ module ShapeUtils
   end
 
   def test_vars
-    p "a:  #{@a.class}"
-    p "i:  #{@i.class}"
-    p "s:  #{@s.class}"
-    p "r:  #{@r.class}"
-    p "w:  #{@w.class}"
-    p "Pi: #{Pi.class}"
-    p "t:  #{@t.class}"
+    p "x:    #{@x.class}"
+    p "y:    #{@y.class}"
+    p "t:    #{@t.class}"
+    p "ra:   #{@ra.class}"
+    p "a:    #{@a.class}"
+    p "i:    #{@i.class}"
+    p "i_x:  #{@i_x.class}"
+    p "i_y:  #{@i_y.class}"
+    p "s:    #{@s.class}"
+    p "s_x:  #{@s.class}"
+    p "s_y:  #{@s.class}"
+    p "r:    #{@r.class}"
+    p "r_x:  #{@r_x.class}"
+    p "r_y:  #{@r_y.class}"
+    p "w:    #{@w.class}"
+    p "Pi:   #{Pi.class}"
   end
 
   class Float 
@@ -168,7 +182,7 @@ module ShapeUtils
   end
   
 =begin
-  ==Printers::gauge_converter
+  ==ShapeUtils::gauge_converter
   This method examines the @t (thickness) variable to see if it is a decimal number or a gauge number.
   @t > 1 are converted to the decimal number equivalents via a case statement.
   @t < 1 are kept as is
@@ -220,6 +234,11 @@ module ShapeUtils
   end
 
 end
+
+
+#########################
+###   Shape Classes   ###
+#########################
 
 =begin
 
@@ -366,7 +385,7 @@ end
 =begin
 Class Rec_tubing(d_x, d_y, ra, thick)
 
-WARNING - THE RECTANGULAR TUBING MATH IS NOT YET ACCURATE
+WARNING - THE RECTANGULAR TUBING MATH IS BROKEN
 
   definition of variables
   d = box tube width, height
@@ -381,11 +400,16 @@ class Rec_tube
   
   include ShapeUtils
   
+#  private
+  
   def initialize(x, y, t, ra)  
+    
     @x = x.to_s.to_d
     @y = y.to_s.to_d
     @t = t.to_s.to_d
     @ra = ra.to_s.to_d
+    
+    gauge_converter
     
     @a = BigDecimal.new("0")
     @c = BigDecimal.new("1")
@@ -397,8 +421,10 @@ class Rec_tube
     @r_y = BigDecimal.new("0")
     @w = BigDecimal.new("0")
     
+    test_vars
+    
     #----------calculate area----------
-    @a = (@t*(( BigDecimal.new("2")*(@x+@y))-( BigDecimal.new("8")*@ra)+(Pi*(( BigDecimal.new("2")*@ra)-@t))))
+    @a = (@t*((BigDecimal.new("2")*(@x+@y))-( BigDecimal.new("8")*@ra)+(Pi*(( BigDecimal.new("2")*@ra)-@t))))
 
     #method - calculate Second Moment of Inertia
     def calc_i(c, b)
@@ -473,35 +499,38 @@ class Bar
   
   include ShapeUtils
   
-  def initialize(x)  
-    @x = x.to_s.to_d
-    
-    @a = BigDecimal.new("0")
-    @i = BigDecimal.new("0")
-    @s = BigDecimal.new("0")
-    @r = BigDecimal.new("0")
-    @w = BigDecimal.new("0")
+  def initialize(x)
 
-    #calculate area
-    @a = @x * @x
-p @a.class    
-    #calculate Second Moment of Inertia
-    @i = (@x**4) / 12
-p @i.class
-    #calculate Section Modulus
-    @s = (@x**3) / 6
-p @s.class
-    #calculate Radius of Gyration
-    @r = sqrt(@i / @a, 2)
-p @r.class    
-    #calculate weight per lin. foot
-    @w = (3.3996.to_d*@a)
-p @w.class
-    #add caculated values to a hash
-    @hash = {"x" => @x.round(4).to_f, "a" => @a.round(4).to_f, "i" => @i.round(4).to_f, "s" => @s.round(4).to_f, "r" => @r.round(4).to_f, "w" => @w.round(4).to_f }
-    @bighash = {"x" => @x, "a" => @a, "i" => @i, "s" => @s, "r" => @r, "w" => @w }
-  end
-end
+    
+     @x = x.to_s.to_d
+     
+     @a = BigDecimal.new("0")
+     @i = BigDecimal.new("0")
+     @s = BigDecimal.new("0")
+     @r = BigDecimal.new("0")
+     @w = BigDecimal.new("0")
+    
+     #calculate area
+     @a = @x * @x
+    
+     #calculate Second Moment of Inertia
+     @i = (@x**4) / 12
+    
+     #calculate Section Modulus
+     @s = (@x**3) / 6
+    
+     #calculate Radius of Gyration
+     @r = sqrt(@i / @a, 2)
+    
+     #calculate weight per lin. foot
+     @w = (3.3996.to_d*@a)
+    
+     #add caculated values to a hash
+     @hash = {"x" => @x.round(4).to_f, "a" => @a.round(4).to_f, "i" => @i.round(4).to_f, "s" => @s.round(4).to_f, "r" => @r.round(4).to_f, "w" => @w.round(4).to_f }
+     @bighash = {"x" => @x, "a" => @a, "i" => @i, "s" => @s, "r" => @r, "w" => @w }
+
+  end #def
+end #class Bar
 
 =begin
 
@@ -557,11 +586,13 @@ end
 
 #require "rod.rb"
 
-=begin
-  Test objects one at a time
-=end
+
+########################
+###   Testing Area   ###
+########################
+
 #  Round_tube.new(1.5, 0.75).props
-  Square_tube.new(3, 18, 0.0625).props
-#  Rec_tube.new(1.0, 3.0, 0.065, 0.005).props
+#  Square_tube.new(3, 18, 0.0625).props
+  Rec_tube.new(1.0, 3.0, 0.065, 0.005).props
 #  Bar.new(5.0).props
 #  Plate.new(4, 5).props
