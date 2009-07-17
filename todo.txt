@@ -1,0 +1,47 @@
+#Shapes Library info file
+=begin
+
+== Todo list ==
+  
+  TODO: create ShapeUtils::pipe_converter method, same as gauge_converter, based on schedule system
+  TODO: create ShapeUtils::corner_radius method to automatically determine radius of corners
+        -method:
+          -calculate shape's perimeter (local var - perimeter) from @x & @y (or @d?)
+          -use a case table to find the radius that is correct for the thickness and perimeter
+          -save the result to the @ra variable
+        -remove ra variable from ShapeClass.new invocation 
+  TODO: Create testing method/module/mixin to verify math and return a pass/fail
+        -Manually enter several accurate results (through range of sizes) w/ corresponding inputs?
+        -Check that calculations == accurate results
+        -Give a prelim pass/fail based on results
+  TODO: Add rod object with calculations (solid round shape)
+  TODO: Add bar object with calculations (square v of plate)
+  TODO: Add plate oject with calculations (rect. v of bar)
+  TODO: hand calculate some of the properties and see if the float values fudge accuracy
+  TODO: examine standardizing all return values from every class?
+        -this would allow several methods to move from Shape specific classes to the ShapeUtils module
+        -Hash, BigHash
+  TODO: Merge Rec_tubing and Square_tubing class?
+  
+  
+  FIXME: Rectangular tubing math is off just a little bit?
+          -precision in the millionths seems to be off - determine where it is failing
+          -seems to be affecting I, S, & R values (check others)
+  FIXME: Fix rectangular tubing math (IT IS BROKEN) & verify
+  FIXME: Bar class returns odd I values to bar.props
+  FIXME: Fix bar math & verify - only guestimates
+
+== Version History ==
+
+v 0.2.5.3 - Current
+    ADDED: new file - todo.txt (this file) - migrated contents from shapes.rb
+    ADDED: more values to gauge_converter. Now includes 0000ga. through 30ga.
+    RENAMED: ShapeUtils::test_vars to ShapeUtils::var_classes
+    FIXED: var_classes code
+    ADDED: ShapeUtils::var_values
+
+v 0.2.5.2
+    ADDED: add ability to use gauges as input arguments as well as decimal thicknesses uses the Printer.gauge_converter method
+
+v 0.2.5
+    ADDED: let attributes be entered without trailing zeros & a decimal point

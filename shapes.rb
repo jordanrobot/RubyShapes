@@ -1,49 +1,12 @@
 #!/usr/bin/env ruby
-
 =begin
 
 ###################################
-###   Shapes Library v 0.2.5.2  ###
+###   Shapes Library v 0.2.5.3  ###
 ###     Matthew D. Jordan       ###
 ###    www.scenic-shop.com      ###
 ### shared under the GNU GPLv3  ###
 ###################################
-
-    TODO: create ShapeUtils::pipe_converter method, same as gauge_converter, based on schedule system
-    TODO: create 
-    TODO: Printers::gauge_converter - add 0ga, 00ga, 000ga, 0000ga
-    TODO: Rework Printers:gauge_converter so that it does not contain the if statement
-    TODO: create ShapeUtils::corner_radius method to automatically determine radius of corners
-          -method:
-            -calculate shape's perimeter (local var - perimeter) from @x & @y (or @d?)
-            -use a case table to find the radius that is correct for the thickness and perimeter
-            -save the result to the @ra variable
-          -remove ra variable from ShapeClass.new invocation 
-    TODO: 
-    TODO: Create testing method/module/mixin to verify math and return a pass/fail
-          -Manually enter several accurate results (through range of sizes) w/ corresponding inputs?
-          -Check that calculations == accurate results
-          -Give a prelim pass/fail based on results
-    TODO: Add rod object with calculations (solid round shape)
-    TODO: Add bar object with calculations (square v of plate)
-    TODO: Add plate oject with calculations (rect. v of bar)
-    TODO: hand calculate some of the properties and see if the float values fudge accuracy
-    TODO: examine standardizing all return values from every class?
-          -this would allow several methods to move from Shape specific classes to the ShapeUtils module
-          -Hash, BigHash
-    TODO: Merge Rec_tubing and Square_tubing class?
-
-
-    FIXME: Rectangular tubing math is off just a little bit?
-            -precision in the millionths seems to be off - determine where it is failing
-            -seems to be affecting I, S, & R values (check others)
-    FIXME: Fix rectangular tubing math (IT IS BROKEN) & verify
-    FIXME: Bar class returns odd I values to bar.props
-    FIXME: Fix bar math & verify - only guestimates
-    
-
-    ADDED: add ability to use gauges as input arguments as well as decimal thicknesses uses the Printer.gauge_converter method
-    ADDED: let attributes be entered without trailing zeros & a decimal point
 
 Library Structure
 -----------------
@@ -65,11 +28,13 @@ Library Structure
     .hash
     .bighash
     .test_object
-    .test_var
+    .var_classes
+    .var_values
     .columns -> BROKEM
     .gauge_converter
 
 =end
+
 #require 'profile'
 require 'bigdecimal'
 require 'bigdecimal/math'
@@ -92,7 +57,11 @@ Pi = BigDecimal.PI(20)
 
 =end
 module ShapeUtils
+
+=begin
+  ==ShapeUtils::props
     #prints rounded (4 places) attributes as floats.  Normally will print all attributes or those specified with obj.props("attribute")
+=end
   def props(arg="list")
     if arg == "list"
       @hash.each {|key, value| puts "#{key}:  #{value}\n"}
@@ -101,7 +70,10 @@ module ShapeUtils
     end
   end
 
+=begin
+  ==ShapeUtils::bigprops
   #prints the complete attributes as bigdecimals.   Normally will print all attributes or those specified with obj.bigprops("attribute")
+=end
   def bigprops(arg='i')
     if arg == 'i'
       @bighash.each {|key, value| puts "#{key}:  #{value}\n"}
@@ -110,22 +82,34 @@ module ShapeUtils
     end
   end  
   
+=begin
+  ==ShapeUtils::hash
   #returns a hash of the attributes (rounded to 4 places, as floats.)
+=end
   def hash
     @hash
   end
 
+=begin
+  ==ShapeUtils::bighash
   #returns a hash of the attributes (as bigdecimals.)  
+=end
   def bighash
      @bighash
   end
   
+=begin
+  ==ShapeUtils::columns
   # FIXME: fix the column method, collapse into an orderly single line
+=end
   def columns
         @hash.each {|key, value| p "#{value}"}
   end
   
+=begin
+  ==ShapeUtils::test_shape
   #test individual shape objects and return results
+=end
   def test_shape
     puts 'Props (Floats):'
     self.props
@@ -156,7 +140,11 @@ module ShapeUtils
     p self.bighash
   end
 
-  def test_vars
+=begin
+  ==ShapeUtils::var_classes
+  puts the classes of instance variables
+=end
+  def var_classes
     p "x:    #{@x.class}"
     p "y:    #{@y.class}"
     p "t:    #{@t.class}"
@@ -166,8 +154,8 @@ module ShapeUtils
     p "i_x:  #{@i_x.class}"
     p "i_y:  #{@i_y.class}"
     p "s:    #{@s.class}"
-    p "s_x:  #{@s.class}"
-    p "s_y:  #{@s.class}"
+    p "s_x:  #{@s_x.class}"
+    p "s_y:  #{@s_y.class}"
     p "r:    #{@r.class}"
     p "r_x:  #{@r_x.class}"
     p "r_y:  #{@r_y.class}"
@@ -175,8 +163,35 @@ module ShapeUtils
     p "Pi:   #{Pi.class}"
   end
 
-  class Float 
-    def big
+=begin
+  ==ShapeUtils::var_values
+  puts the instance variables' values
+=end
+  def var_values
+    p "x:    #{@x}"
+    p "y:    #{@y}"
+    p "t:    #{@t}"
+    p "ra:   #{@ra}"
+    p "a:    #{@a}"
+    p "i:    #{@i}"
+    p "i_x:  #{@i_x}"
+    p "i_y:  #{@i_y}"
+    p "s:    #{@s}"
+    p "s_x:  #{@s_x}"
+    p "s_y:  #{@s_y}"
+    p "r:    #{@r}"
+    p "r_x:  #{@r_x}"
+    p "r_y:  #{@r_y}"
+    p "w:    #{@w}"
+    p "Pi:   #{Pi}"
+  end
+
+=begin
+  ==Float::to_d
+  adds to_d method to Float class
+=end
+  class Float
+    def to_d
       BigDecimal(self.to_s)
     end 
   end
@@ -188,49 +203,71 @@ module ShapeUtils
   @t < 1 are kept as is
 =end
   def gauge_converter
-    if @t > 1 then
       case @t
-      when 20
+      when "30"
+        @t = 0.012
+      when "29"   
+        @t = 0.013
+      when "28"
+        @t = 0.014        
+      when "27"
+        @t = 0.016
+      when "26"
+        @t = 0.018
+      when "25"
+        @t = 0.020
+      when "24"
+        @t = 0.022
+      when "23"
+        @t = 0.025
+      when "22"
+        @t = 0.028
+      when "21"
+        @t = 0.032
+      when "20"
         @t = 0.035
-      when 18
+      when "18"
         @t = 0.049
-      when 16
+      when "16"
         @t = 0.065
-      when 14
+      when "14"
         @t = 0.083
-      when 13
+      when "13"
         @t = 0.095
-      when 12
+      when "12"
         @t = 0.109
-      when 11
+      when "11"
         @t = 0.120
-      when 10
+      when "10"
         @t = 0.134
-      when 9
+      when "9"
         @t = 0.148
-      when 8
+      when "8"
         @t = 0.165
-      when 7
+      when "7"
         @t = 0.180
-      when 6
+      when "6"
         @t = 0.203
-      when 5
+      when "5"
         @t = 0.220
-      when 4
+      when "4"
         @t = 0.238
-      when 3
+      when "3"
         @t = 0.259
-      when 2
+      when "2"
         @t = 0.284
-      when 1
+      when "1"
         @t = 0.300
+      when "0"
+        @t = 0.34
+      when "00"
+        @t = 0.38
+      when "000"
+        @t = 0.425
+      when "0000"
+        @t = 0.454
       end
-    if @t > 20
-      puts "Please enter an accurate thickness, either as a decimal number or as a gauge number"
-      exit
-    end
-    @t = @t.to_s.to_d
-    end
+    @t = @t.to_d
   end
 
 end
@@ -305,7 +342,7 @@ Class Square_tube(od, thickness, radius)
     .initialize
 
   accepts 3 inputs via args
-    @d  = outside diameter
+    @x  = size
     @t  = thickness of tubing
     @ra = radius at corner
 
@@ -318,15 +355,15 @@ Class Square_tube(od, thickness, radius)
 
 =end
 class Square_tube
-  attr_accessor :d, :ra, :t, :a, :i, :s, :r, :w
+  attr_accessor :x, :ra, :t, :a, :i, :s, :r, :w
   
   include ShapeUtils
 
-  def initialize(d, t, ra)  
+  def initialize(x, t, ra)  
 
 
-    @d = d.to_s.to_d
-    @t = t.to_s.to_d
+    @x = x.to_s.to_d
+    @t = t.to_s
     @ra = ra.to_s.to_d
     
     gauge_converter
@@ -339,17 +376,18 @@ class Square_tube
     @w = BigDecimal.new("0")
 
     #calculate Square Area
-    @a = (@t * ((4 * @d) - (8 * @ra) + ( Pi * (2*@ra - @t) ) ))
+    @a = (@t * ((4 * @x) - (8 * @ra) + ( Pi * (2*@ra - @t) ) ))
 
     #calculate Moment of I
     temp = BigDecimal.new("0")
-    temp = ((@t**3*(@d-(2*@ra)))/6)
-    temp = temp + (( 2 * @t * ( @d - ( 2 * @ra ))) * (( @d - @t ) / 2 )**2)
-    temp = temp + (@t * ((@d-(2*@ra))**3)) /6
+    temp = ((@t**3*(@x-(2*@ra)))/6)
+    temp = temp + (( 2 * @t * ( @x - ( 2 * @ra ))) * (( @x - @t ) / 2 )**2)
+    temp = temp + (@t * ((@x-(2*@ra))**3)) /6
     temp = temp + (( Pi / 4 ) - 8 / ( ( 9 / 2 ) * Pi ) ) * ((@ra**4)-((@ra-@t)**4))
     temp = temp - (( 8 * @t ) * ( @ra**2 ) * ( @ra - @t ) ** 2 ) / ( (9/2) * ( Pi * (( 2 * @ra ) - @t )))
 
     temp2 = BigDecimal.new("0")
+    
     b = BigDecimal.new("0")
     c = BigDecimal.new("0")
     x = BigDecimal.new("0")
@@ -358,26 +396,27 @@ class Square_tube
     w = 4 * (@ra**3 - ((@ra-@t)**3))
     x = (3 * Pi) * ((@ra**2) - ((@ra-@t)**2))
     b = ((Pi*@t) * ((2*@ra)-@t) )
-    c = ((@d/2) - @ra + (@w/x))**2
+    c = ((@x/2) - @ra + (@w/x))**2
     temp2 = b * c
     
     @i = temp + temp2
     
     #Section Modulus
-    @s = ((2 * @i)/@d)
+    @s = ((2 * @i)/@x)
     
     #Radius of Gyration
     @r = (@i/@a).sqrt(2)
-    
+
+#change "".to_d to .big    
     #Weight / ft.
-    @w = (3.3996.to_d*@a)
+    @w = ("3.3996".to_d*@a)
 
 
 #    @hash = {"d" => @d.round(4).to_f, "t" => @t.round(4).to_f, "a" => @a.round(4).to_f, "i" => @i.round(4).to_f, "s" => @s.round(4).to_f, "r" => @r.round(4).to_s, "w" => @w.round(4).to_s }
 
     #add caculated values to a hash
-    @hash = {"d" => @d.round(4), "t" => @t.round(4), "a" => @a.round(4), "i" => @i.round(4), "s" => @s.round(4), "r" => @r.round(4), "w" => @w.round(4) }
-    @bighash = {"d" => @d, "t" => @t, "a" => @a, "i" => @i, "s" => @s, "r" => @r, "w" => @w }
+    @hash = {"x" => @x.round(4), "t" => @t.round(4), "a" => @a.round(4), "i" => @i.round(4), "s" => @s.round(4), "r" => @r.round(4), "w" => @w.round(4) }
+    @bighash = {"x" => @x, "t" => @t, "a" => @a, "i" => @i, "s" => @s, "r" => @r, "w" => @w }
 
   end
 end
@@ -406,7 +445,7 @@ class Rec_tube
     
     @x = x.to_s.to_d
     @y = y.to_s.to_d
-    @t = t.to_s.to_d
+    @t = t.to_s
     @ra = ra.to_s.to_d
     
     gauge_converter
@@ -420,8 +459,7 @@ class Rec_tube
     @r_x = BigDecimal.new("0")
     @r_y = BigDecimal.new("0")
     @w = BigDecimal.new("0")
-    
-    test_vars
+
     
     #----------calculate area----------
     @a = (@t*((BigDecimal.new("2")*(@x+@y))-( BigDecimal.new("8")*@ra)+(Pi*(( BigDecimal.new("2")*@ra)-@t))))
@@ -538,8 +576,9 @@ Class Plate(x, y)
 
 FIXME: Check Math, guestimated most of it
 
-#  definition of variables
-#  x = bar dimension - x & y    
+  definition of variables
+  x = dimension
+  y = dimension
 
 =end
 class Plate
@@ -583,16 +622,23 @@ class Plate
   end
 end
 
+=begin
 
-#require "rod.rb"
+Class Rod(d)
+  definition of variables
+  d = diameter
 
+=end
+class Rod
+#Brand new class - fill in with stuff!
+end
 
 ########################
 ###   Testing Area   ###
 ########################
 
 #  Round_tube.new(1.5, 0.75).props
-#  Square_tube.new(3, 18, 0.0625).props
+#  Square_tube.new(3, 13, 0.0625).props
   Rec_tube.new(1.0, 3.0, 0.065, 0.005).props
 #  Bar.new(5.0).props
 #  Plate.new(4, 5).props
