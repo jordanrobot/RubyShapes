@@ -720,7 +720,7 @@ end
 ########################
 
 #  Round_tube.new(1.5, 0.75).props
-#  Square_tube.new(3, 13, 0.0625).props
+  Square_tube.new(3, 13).props
 #  Rec_tube.new(1.0, 3.0, 0.065, 0.005).props
 #  Bar.new(5.0).props
 #  Plate.new(4, 5).props
