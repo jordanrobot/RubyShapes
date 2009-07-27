@@ -720,16 +720,8 @@ end
 ########################
 
 #  Round_tube.new(1.5, 0.75).props
-<<<<<<< HEAD:shapes.rb
 #  Square_tube.new(3, 13, 0.0625).props
 #  Rec_tube.new(1.0, 3.0, 0.065, 0.005).props
 #  Bar.new(5.0).props
 #  Plate.new(4, 5).props
-  Rod.new(2).props
-=======
-  Square_tube.new(1, 18).props
-#  Rec_tube.new(1.0, 3.0, 0.065, 0.005).props
-#  Bar.new(5.0).props
-#  Plate.new(4, 5).props
 #  Rod.new(2).props
->>>>>>> corner.radius:shapes.rb
