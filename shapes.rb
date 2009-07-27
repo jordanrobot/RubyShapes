@@ -43,8 +43,10 @@ include BigMath
 
 #Constants
 Pi = BigDecimal.PI(20)
+#$gauge_factors = ["30" => 0.012, "29" => 0.013, "28" => 0.014, "27" => 0.016, "26" => 0.018, "25" => 0.020, "24" => 0.022, "23" => 0.025, "22" => 0.028, "21" => 0.032, "20" => 0.035, "18" => 0.049, "16" => 0.065, "14" => 0.083, "13" => 0.095, "12" => 0.109, "11" => 0.120, "10" => 0.134, "9" => 0.148, "8" => 0.165, "7" => 0.180, "6" => 0.203, "5" => 0.220, "4" => 0.238, "3" => 0.259, "2" => 0.284, "1" => 0.300, "0" => 0.34, "00" => 0.38, "000" => 0.425, "0000" => 0.454 ]
 
-$diagnostics = "on"
+DIAGNOSTICS = "on"
+
 
 #############################
 ###   ShapeUtils Module   ###
@@ -64,9 +66,20 @@ module ShapeUtils
   Outputs a formated label to the screen.  Used for testing and debugging
 =end
 def label(arg)
-  if $diagnostics == "on"
+  if DIAGNOSTICS == "on"
     puts ""
     puts "----  #{arg}  ----"
+  end
+end
+
+=begin
+  ==ShapeUtils:class_label
+  Outputs a formated label to the screen.  Used for testing and debugging
+=end
+def class_label
+  if DIAGNOSTICS == "on"
+    puts ""
+    puts "====  Begin calculating a #{self.class} Class  ===="
   end
 end
 
@@ -123,7 +136,7 @@ end
   #test individual shape objects and return results
 =end
   def test_shape
-    if $diagnostics == "on"
+    if DIAGNOSTICS == "on"
       label("testing shape object")
       puts 'Props (Floats):'
       self.props
@@ -160,7 +173,7 @@ end
   puts the classes of instance variables
 =end
   def var_classes
-    if $diagnostics == "on"
+    if DIAGNOSTICS == "on"
       label("Diagnostic: output variable classes")
       p "x:    #{@x.class}"
       p "y:    #{@y.class}"
@@ -186,7 +199,7 @@ end
   puts the instance variables' values
 =end
   def var_values
-    if $diagnostics == "on"
+    if DIAGNOSTICS == "on"
       label("diagnostic: variable values")
       p "x:    #{@x}"
       p "y:    #{@y}"
@@ -226,6 +239,8 @@ end
   @t < 1 are kept as is
 =end
   def gauge_converter
+
+#@t = $gauge_factors["@t"]
       case @t
       when "30"
         @t = 0.012
@@ -289,10 +304,11 @@ end
         @t = 0.425
       when "0000"
         @t = 0.454
-      end
-    @t = @t.to_d
+      end #case
+
+    @t = @t.to_s.to_d
     
-    if $diagnostics == "on"
+    if DIAGNOSTICS == "on"
       label("method: running gauge converter")
       puts "@thickness:   #{t}, #{@t.class}"
       puts
@@ -304,19 +320,24 @@ end
   ==ShapeUtils:corner_radius
   Will determine rectangular tubing corner radius based on perimeter & thickness
 =end
-  def corner_radius(ed, t)
-    if $diagnostics == "on"
-      label("method: calculating corner radius")
-      puts "@equivalent diameter:   #{ed.round(4)}, #{@ed.class}"
-      puts "@thickness:             #{@t.to_f.to_s}, #{@t.class}"
-      puts
-    end #if
+  def corner_radius(x, y, t)
+    equiv_diam = ((x * 2) + (y * 2)) / Pi
 
-    if ed === (0.5...2)
+    @ra = "0.03125".to_d
+    if equiv_diam === (0.5...2)
       @ra = "0.03125".to_d
       #if @t.to_f.to_s# == "0.022"
     end #if
 
+    
+
+    if DIAGNOSTICS == "on"
+      label("method: calculating corner radius")
+      puts "@equivalent diameter:   #{equiv_diam.round(4)}, #{@equiv_diam.class}"
+      puts "@thickness:             #{@t.to_f.to_s}, #{@t.class}"
+      puts "@radius:                #{@ra.to_f.to_s}, #{@ra.class}"
+      puts
+    end #if
   end #def
 
 end #ShapeUtils
@@ -351,6 +372,8 @@ class Round_tube
   include ShapeUtils
 
   def initialize(d, t)  
+    class_label
+
     @d = d.to_s.to_d
     @t = t.to_s.to_d
 
@@ -360,11 +383,11 @@ class Round_tube
     @s = BigDecimal.new("0")
     @r = BigDecimal.new("0")
     @w = BigDecimal.new("0")
-
+    
     #calculate Round tube Area
      @a = (Pi*@t) * (@d-@t)
 
-     #Calculate Round Tube Second Moment of Inertia   
+     #calculate Second Moment of Area (I)
      @i = Pi * (@d**4 - ((@d - (2*@t))**4 ))/64
 
      #Calculate Round Tube Section Modulus
@@ -409,18 +432,15 @@ class Square_tube
   include ShapeUtils
 
   def initialize(x, t)
-
+    class_label
+    
     @x = x.to_s.to_d
     @t = t.to_s
-    @ra = BigDecimal.new("0")
-        
+
+    #use ShapeUtils methods to get more dimensions
     gauge_converter
-
-    #top of the corner radius decision tree
-    equiv_diam = (@x * 4) / Pi
-    corner_radius(equiv_diam, t)
-
-    #declare class Variables
+    corner_radius(@x, @x, @t)
+    
     @a = BigDecimal.new("0")
     @i = BigDecimal.new("0")
     @s = BigDecimal.new("0")
@@ -430,7 +450,7 @@ class Square_tube
     #calculate Square Area
     @a = (@t * ((4 * @x) - (8 * @ra) + ( Pi * (2*@ra - @t) ) ))
 
-    #calculate Moment of I
+    #calculate Second Moment of Area (I)
     temp = BigDecimal.new("0")
     temp = ((@t**3*(@x-(2*@ra)))/6)
     temp = temp + (( 2 * @t * ( @x - ( 2 * @ra ))) * (( @x - @t ) / 2 )**2)
@@ -450,12 +470,12 @@ class Square_tube
     b = ((Pi*@t) * ((2*@ra)-@t) )
     c = ((@x/2) - @ra + (@w/x))**2
     temp2 = b * c
-    
+
     @i = temp + temp2
     
     #Section Modulus
     @s = ((2 * @i)/@x)
-    
+
     #Radius of Gyration
     @r = (@i/@a).sqrt(2)
 
@@ -490,7 +510,8 @@ class Rec_tube
   private
   
   def initialize(x, y, t, ra)  
-    
+    class_label   
+
     @x = x.to_s.to_d
     @y = y.to_s.to_d
     @t = t.to_s
@@ -582,38 +603,36 @@ FIXME: Check Math, guestimated most of it
 =end
 class Bar
   attr_accessor :x, :a, :i, :s, :r, :w
-  
   include ShapeUtils
   
   def initialize(x)
+    class_label    
 
+    @x = x.to_s.to_d
+    @a = BigDecimal.new("0")
+    @i = BigDecimal.new("0")
+    @s = BigDecimal.new("0")
+    @r = BigDecimal.new("0")
+    @w = BigDecimal.new("0")
+
+    #calculate area
+    @a = @x * @x
     
-     @x = x.to_s.to_d
-     
-     @a = BigDecimal.new("0")
-     @i = BigDecimal.new("0")
-     @s = BigDecimal.new("0")
-     @r = BigDecimal.new("0")
-     @w = BigDecimal.new("0")
+    #calculate Second Moment of Inertia
+    @i = (@x**4) / 12
     
-     #calculate area
-     @a = @x * @x
+    #calculate Section Modulus
+    @s = (@x**3) / 6
     
-     #calculate Second Moment of Inertia
-     @i = (@x**4) / 12
+    #calculate Radius of Gyration
+    @r = sqrt(@i / @a, 2)
     
-     #calculate Section Modulus
-     @s = (@x**3) / 6
+    #calculate weight per lin. foot
+    @w = (3.3996.to_d*@a)
     
-     #calculate Radius of Gyration
-     @r = sqrt(@i / @a, 2)
-    
-     #calculate weight per lin. foot
-     @w = (3.3996.to_d*@a)
-    
-     #add caculated values to a hash
-     @hash = {"x" => @x.round(4).to_f, "a" => @a.round(4).to_f, "i" => @i.round(4).to_f, "s" => @s.round(4).to_f, "r" => @r.round(4).to_f, "w" => @w.round(4).to_f }
-     @bighash = {"x" => @x, "a" => @a, "i" => @i, "s" => @s, "r" => @r, "w" => @w }
+    #add caculated values to a hash
+    @hash = {"x" => @x.round(4).to_f, "a" => @a.round(4).to_f, "i" => @i.round(4).to_f, "s" => @s.round(4).to_f, "r" => @r.round(4).to_f, "w" => @w.round(4).to_f }
+    @bighash = {"x" => @x, "a" => @a, "i" => @i, "s" => @s, "r" => @r, "w" => @w }
 
   end #def
 end #class Bar
@@ -631,13 +650,13 @@ FIXME: Check Math, guestimated most of it
 =end
 class Plate
   attr_accessor :x, :y, :a, :i_x, :i_y, :s_x, :s_y, :r_x, :r_y, :w
-  
   include ShapeUtils
   
   def initialize(x, y)  
+    class_label
+
     @x = x.to_s.to_d
     @y = y.to_s.to_d
-    
     @a = BigDecimal.new("0")
     @i_x = BigDecimal.new("0")
     @i_y = BigDecimal.new("0")
@@ -646,7 +665,6 @@ class Plate
     @r_x = BigDecimal.new("0")
     @r_y = BigDecimal.new("0")
     @w = BigDecimal.new("0")
-    
 
     #calculate area
     @a = @x * @y
@@ -679,11 +697,11 @@ Class Rod(d)
 =end
 class Rod
   attr_accessor :x, :a, :i, :s, :r, :w
-  
   include ShapeUtils
   
   def initialize(x)
-
+    class_label
+    
      @x = x.to_s.to_d
      
      @a = BigDecimal.new("0")
@@ -720,7 +738,7 @@ end
 ########################
 
 #  Round_tube.new(1.5, 0.75).props
-  Square_tube.new(3, 13).props
+  Square_tube.new(3, 11).props
 #  Rec_tube.new(1.0, 3.0, 0.065, 0.005).props
 #  Bar.new(5.0).props
 #  Plate.new(4, 5).props
