@@ -14,7 +14,6 @@
         -Manually enter several accurate results (through range of sizes) w/ corresponding inputs?
         -Check that calculations == accurate results
         -Give a prelim pass/fail based on results
-  TODO: Add rod object with calculations (solid round shape)
   TODO: Add bar object with calculations (square v of plate)
   TODO: Add plate oject with calculations (rect. v of bar)
   TODO: hand calculate some of the properties and see if the float values fudge accuracy
@@ -32,8 +31,10 @@
   FIXME: Fix bar math & verify - only guestimates
 
 == Version History ==
-v 0.2.5.4 - current
+v 0.2.5.4
     ADDED: Added round bar stuff - math has not been verified
+    ADDED: Diagnostic flag - $diagnostics (on/off)
+    ADDED: Diagnostic methods & such, .label
 
 v 0.2.5.3
     ADDED: new file - todo.txt (this file) - migrated contents from shapes.rb

@@ -44,6 +44,7 @@ include BigMath
 #Constants
 Pi = BigDecimal.PI(20)
 
+$diagnostics = "on"
 
 #############################
 ###   ShapeUtils Module   ###
@@ -57,6 +58,17 @@ Pi = BigDecimal.PI(20)
 
 =end
 module ShapeUtils
+
+=begin
+  ==ShapeUtils:label
+  Outputs a formated label to the screen.  Used for testing and debugging
+=end
+def label(arg)
+  if $diagnostics == "on"
+    puts ""
+    puts "----  #{arg}  ----"
+  end
+end
 
 =begin
   ==ShapeUtils::props
@@ -111,80 +123,91 @@ module ShapeUtils
   #test individual shape objects and return results
 =end
   def test_shape
-    puts 'Props (Floats):'
-    self.props
-
-    puts
-
-    puts 'Individual values (Floats):'
-    self.props("x")
-
-    puts
-
-    puts 'Bigprops (BigDecimals):'
-    self.bigprops
-
-    puts
-
-    puts 'Return individual values (BigDecimals):'
-    self.bigprops("a")
-
-    puts
-
-    puts 'Return all values in the object (Hash):'
-    p self.hash
-
-    puts
-
-    puts 'Return all values in the object (BigDecimal Hash):'
-    p self.bighash
-  end
+    if $diagnostics == "on"
+      label("testing shape object")
+      puts 'Props (Floats):'
+      self.props
+  
+      puts
+  
+      puts 'Individual values (Floats):'
+      self.props("x")
+  
+      puts
+  
+      puts 'Bigprops (BigDecimals):'
+      self.bigprops
+  
+      puts
+  
+      puts 'Return individual values (BigDecimals):'
+      self.bigprops("a")
+  
+      puts
+  
+      puts 'Return all values in the object (Hash):'
+      p self.hash
+  
+      puts
+  
+      puts 'Return all values in the object (BigDecimal Hash):'
+      p self.bighash
+    end #if
+  end #def
 
 =begin
   ==ShapeUtils::var_classes
   puts the classes of instance variables
 =end
   def var_classes
-    p "x:    #{@x.class}"
-    p "y:    #{@y.class}"
-    p "t:    #{@t.class}"
-    p "ra:   #{@ra.class}"
-    p "a:    #{@a.class}"
-    p "i:    #{@i.class}"
-    p "i_x:  #{@i_x.class}"
-    p "i_y:  #{@i_y.class}"
-    p "s:    #{@s.class}"
-    p "s_x:  #{@s_x.class}"
-    p "s_y:  #{@s_y.class}"
-    p "r:    #{@r.class}"
-    p "r_x:  #{@r_x.class}"
-    p "r_y:  #{@r_y.class}"
-    p "w:    #{@w.class}"
-    p "Pi:   #{Pi.class}"
-  end
+    if $diagnostics == "on"
+      label("Diagnostic: output variable classes")
+      p "x:    #{@x.class}"
+      p "y:    #{@y.class}"
+      p "t:    #{@t.class}"
+      p "ra:   #{@ra.class}"
+      p "a:    #{@a.class}"
+      p "i:    #{@i.class}"
+      p "i_x:  #{@i_x.class}"
+      p "i_y:  #{@i_y.class}"
+      p "s:    #{@s.class}"
+      p "s_x:  #{@s_x.class}"
+      p "s_y:  #{@s_y.class}"
+      p "r:    #{@r.class}"
+      p "r_x:  #{@r_x.class}"
+      p "r_y:  #{@r_y.class}"
+      p "w:    #{@w.class}"
+      p "Pi:   #{Pi.class}"
+    end #if
+  end #def
 
 =begin
   ==ShapeUtils::var_values
   puts the instance variables' values
 =end
   def var_values
-    p "x:    #{@x}"
-    p "y:    #{@y}"
-    p "t:    #{@t}"
-    p "ra:   #{@ra}"
-    p "a:    #{@a}"
-    p "i:    #{@i}"
-    p "i_x:  #{@i_x}"
-    p "i_y:  #{@i_y}"
-    p "s:    #{@s}"
-    p "s_x:  #{@s_x}"
-    p "s_y:  #{@s_y}"
-    p "r:    #{@r}"
-    p "r_x:  #{@r_x}"
-    p "r_y:  #{@r_y}"
-    p "w:    #{@w}"
-    p "Pi:   #{Pi}"
-  end
+    if $diagnostics == "on"
+      label("diagnostic: variable values")
+      p "x:    #{@x}"
+      p "y:    #{@y}"
+      p "t:    #{@t}"
+      p "ed:   #{@equiv_diameter}"
+      p "ra:   #{@ra}"
+      p "a:    #{@a}"
+      p "i:    #{@i}"
+      p "i_x:  #{@i_x}"
+      p "i_y:  #{@i_y}"
+      p "s:    #{@s}"
+      p "s_x:  #{@s_x}"
+      p "s_y:  #{@s_y}"
+      p "r:    #{@r}"
+      p "r_x:  #{@r_x}"
+      p "r_y:  #{@r_y}"
+      p "w:    #{@w}"
+      p "Pi:   #{Pi}"
+    else
+    end #if
+  end #def
 
 =begin
   ==Float::to_d
@@ -268,9 +291,35 @@ module ShapeUtils
         @t = 0.454
       end
     @t = @t.to_d
-  end
+    
+    if $diagnostics == "on"
+      label("method: running gauge converter")
+      puts "@thickness:   #{t}, #{@t.class}"
+      puts
+    end #if
 
-end
+  end #def
+
+=begin
+  ==ShapeUtils:corner_radius
+  Will determine rectangular tubing corner radius based on perimeter & thickness
+=end
+  def corner_radius(ed, t)
+    if $diagnostics == "on"
+      label("method: calculating corner radius")
+      puts "@equivalent diameter:   #{ed.round(4)}, #{@ed.class}"
+      puts "@thickness:             #{@t.to_f.to_s}, #{@t.class}"
+      puts
+    end #if
+
+    if ed === (0.5...2)
+      @ra = "0.03125".to_d
+      #if @t.to_f.to_s# == "0.022"
+    end #if
+
+  end #def
+
+end #ShapeUtils
 
 
 #########################
@@ -359,15 +408,18 @@ class Square_tube
   
   include ShapeUtils
 
-  def initialize(x, t, ra)  
-
+  def initialize(x, t)
 
     @x = x.to_s.to_d
     @t = t.to_s
-    @ra = ra.to_s.to_d
-    
+    @ra = BigDecimal.new("0")
+        
     gauge_converter
-    
+
+    #top of the corner radius decision tree
+    equiv_diam = (@x * 4) / Pi
+    corner_radius(equiv_diam, t)
+
     #declare class Variables
     @a = BigDecimal.new("0")
     @i = BigDecimal.new("0")
@@ -407,19 +459,15 @@ class Square_tube
     #Radius of Gyration
     @r = (@i/@a).sqrt(2)
 
-#change "".to_d to .big    
     #Weight / ft.
     @w = ("3.3996".to_d*@a)
-
-
-#    @hash = {"d" => @d.round(4).to_f, "t" => @t.round(4).to_f, "a" => @a.round(4).to_f, "i" => @i.round(4).to_f, "s" => @s.round(4).to_f, "r" => @r.round(4).to_s, "w" => @w.round(4).to_s }
 
     #add caculated values to a hash
     @hash = {"x" => @x.round(4), "t" => @t.round(4), "a" => @a.round(4), "i" => @i.round(4), "s" => @s.round(4), "r" => @r.round(4), "w" => @w.round(4) }
     @bighash = {"x" => @x, "t" => @t, "a" => @a, "i" => @i, "s" => @s, "r" => @r, "w" => @w }
 
-  end
-end
+  end #def initialize
+end #Square_tube
 
 =begin
 Class Rec_tubing(d_x, d_y, ra, thick)
@@ -672,8 +720,16 @@ end
 ########################
 
 #  Round_tube.new(1.5, 0.75).props
+<<<<<<< HEAD:shapes.rb
 #  Square_tube.new(3, 13, 0.0625).props
 #  Rec_tube.new(1.0, 3.0, 0.065, 0.005).props
 #  Bar.new(5.0).props
 #  Plate.new(4, 5).props
   Rod.new(2).props
+=======
+  Square_tube.new(1, 18).props
+#  Rec_tube.new(1.0, 3.0, 0.065, 0.005).props
+#  Bar.new(5.0).props
+#  Plate.new(4, 5).props
+#  Rod.new(2).props
+>>>>>>> corner.radius:shapes.rb
