@@ -3,10 +3,10 @@
 
 == Todo list ==
   
+  TODO: Fix the corner radius decision tree
   TODO: create ShapeUtils::pipe_converter method, same as gauge_converter, based on schedule system
   TODO: create ShapeUtils::corner_radius method to automatically determine radius of corners
         -method:
-          -calculate shape's perimeter (local var - perimeter) from @x & @y (or @d?)
           -use a case table to find the radius that is correct for the thickness and perimeter
           -save the result to the @ra variable
         -remove ra variable from ShapeClass.new invocation 
@@ -14,23 +14,28 @@
         -Manually enter several accurate results (through range of sizes) w/ corresponding inputs?
         -Check that calculations == accurate results
         -Give a prelim pass/fail based on results
-  TODO: Add bar object with calculations (square v of plate)
-  TODO: Add plate oject with calculations (rect. v of bar)
   TODO: hand calculate some of the properties and see if the float values fudge accuracy
   TODO: examine standardizing all return values from every class?
         -this would allow several methods to move from Shape specific classes to the ShapeUtils module
         -Hash, BigHash
   TODO: Merge Rec_tubing and Square_tubing class?
-  
-  
-  FIXME: Rectangular tubing math is off just a little bit?
+
+  FIXME: Rectangular tubing accuracy is off just a little bit?
           -precision in the millionths seems to be off - determine where it is failing
           -seems to be affecting I, S, & R values (check others)
   FIXME: Fix rectangular tubing math (IT IS BROKEN) & verify
-  FIXME: Bar class returns odd I values to bar.props
+  FIXME: Bar class returns odd I values to bar.props, alo S & R are broken
   FIXME: Fix bar math & verify - only guestimates
 
+
 == Version History ==
+
+v 0.2.6 - current
+    VERIFIED: Round tube calculations are accurate! 
+    ADDED: ShapeUtils:gauge_converter now pulls values from a $gauge_factors hash
+    ADDED: Diagnostic label system, uses an 'if DIAGNOSTICS = "on"' test to determine whether to print or not
+    TODO: Fix the corner radius decision tree
+
 v 0.2.5.4
     ADDED: Added round bar stuff - math has not been verified
     ADDED: Diagnostic flag - $diagnostics (on/off)
