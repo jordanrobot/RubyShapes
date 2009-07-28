@@ -76,21 +76,21 @@ end #def diag_section
   Outputs a formated label to the screen.  Used for testing and debugging
 =end
   def diag_section(arg)
-  if DIAGNOSTICS == "on"
-    puts ""
-    puts "----  #{arg}  ----"
-  end #if
-end #def diag_section
+    if DIAGNOSTICS == "on"
+      puts ""
+      puts "----  #{arg}  ----"
+    end #if
+  end #def diag_section
 
 =begin
   ==ShapeUtils:diag_line
   Outputs a formated label to the screen.  Used for testing and debugging
 =end
   def diag_line(arg)
-  if DIAGNOSTICS == "on"
-    puts arg
-  end #if
-end #def diag_line
+    if DIAGNOSTICS == "on"
+      puts arg
+    end #if
+  end #def diag_line
 
 =begin
   ==ShapeUtils:diag_class
@@ -101,7 +101,7 @@ end #def diag_line
       puts ""
       puts "====  Now initiating a #{self.class} class  ===="
     end #if
-end #def diag_class
+  end #def diag_class
 
 =begin
   ==ShapeUtils::props
@@ -283,11 +283,11 @@ private
   def corner_radius
     equiv_diam = (((@x * 2) + (@y * 2)) / Pi)
 
-    @ra = 0.03125.to_d
-    if equiv_diam === (0.5...2)
-      @ra = "0.03125".to_d
-      #if @t.to_f.to_s# == "0.022"
-    end #if
+#    @ra = 0.03125.to_d
+#    if equiv_diam === (0.5...2)
+#      @ra = "0.03125".to_d
+#      #if @t.to_f.to_s# == "0.022"
+#    end #if
 
     diag_section("private method: calculating corner radius")
     diag_line("equivalent diameter:   #{equiv_diam.round(4)}, #{equiv_diam.class}")
@@ -331,8 +331,10 @@ class Round_tube
     diag_class
 
     @d = d.to_s.to_d
-    @t = t.to_s.to_d
+    @t = t.to_i
 
+    gauge_converter
+    
     #declare class Variables
     @a = BigDecimal.new("0")
     @i = BigDecimal.new("0")
@@ -383,17 +385,18 @@ Class Square_tube(od, thickness, radius)
 
 =end
 class Square_tube
-  attr_accessor :x, :y, :t, :a, :i, :s, :r, :w
+  attr_accessor :x, :y, :t, :a, :i, :s, :r, :w, :ra
 
   include ShapeUtils
 
-  def initialize(x, t)
+  def initialize(x, t, ra)
     diag_class
 
     @x = x.to_s.to_d
     @y = @x
     @t = t.to_i
-    @ra = BigDecimal.new("0")
+    @ra = ra.to_d
+#    @ra = BigDecimal.new("0")
 
     #use ShapeUtils methods to get more dimensions
     gauge_converter
@@ -693,8 +696,8 @@ end #class Rod
 ###   Testing Area   ###
 ########################
 
-  Round_tube.new(3, 0.1).props
-#  Square_tube.new(3, 18).props
+  Round_tube.new(4, 18).props
+#  Square_tube.new(3, 18, 0.0625).props
 #  Rec_tube.new(1.0, 3.0, 0.065, 0.005).props
 #  Bar.new(5.0).props
 #  Plate.new(4, 5).props
