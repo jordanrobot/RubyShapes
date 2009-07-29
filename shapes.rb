@@ -43,8 +43,8 @@ include BigMath
 
 #Constants
 Pi = BigDecimal.PI(20)
-$gauge_factors = {30=>0.012, 29=>0.013, 28=>0.014, 27=>0.016, 26=>0.018, 25=>0.020, 24=>0.022, 23=>0.025, 22=>0.028, 21=>0.032, 20=>0.035, 18=>0.049, 16=>0.065, 14=>0.083, 13=>0.095, 12=>0.109, 11=>0.120, 10=>0.134, 9=>0.148, 8=>0.165, 7=>0.180, 6=>0.203, 5=>0.220, 4=>0.238, 3=>0.259, 2=>0.284, 1=>0.300, 0=>0.34, 00=>0.38, 000=>0.425, 0000=>0.454}
-$radius_factors = {20=>0.04675, 18=>0.09}
+$gauge_factors = { 30=>0.012, 29=>0.013, 28=>0.014, 27=>0.016, 26=>0.018, 25=>0.020, 24=>0.022, 23=>0.025, 22=>0.028, 21=>0.032, 20=>0.035, 18=>0.049, 16=>0.065, 14=>0.083, 13=>0.095, 12=>0.109, 11=>0.120, 10=>0.134, 9=>0.148, 8=>0.165, 7=>0.180, 6=>0.203, 5=>0.220, 4=>0.238, 3=>0.259, 2=>0.284, 1=>0.300, 0=>0.34, 00=>0.38, 000=>0.425, 0000=>0.454 }
+$radius_factors = { 20=>"0.04675", 19=>"0.0625", 18=>"0.0625" }
 
 DIAGNOSTICS = "on"
 
@@ -153,13 +153,19 @@ module ShapeUtils
   end #def bighash
   
 =begin
+  ==ShapeUtils::columns_header
+=end
+  def columns_header
+    puts "d    t      a       w       i       s       r"
+  end #def columns_header
+
+=begin
   ==ShapeUtils::columns
   # FIXME: fix the column method, collapse into an orderly single line
 =end
   def columns
     diag_section(".columns: printing shape properties in column format")
-    puts "#{@x.round(4)}  #{@t.round(4)}  #{@a.round(4)}  #{@w.round(4)}  #{@i.round(4)}  #{@s.round(4)}  #{@r.round(4)}"
-#    @hash.each {|key, value| p "#{value}"}
+    puts "#{@x.round(4).to_f}  #{@t.round(4).to_f}  #{@a.round(4).to_f}  #{@w.round(4).to_f}  #{@i.round(4).to_f}  #{@s.round(4).to_f}  #{@r.round(4).to_f}"
   end #def columns
   
 =begin
@@ -265,39 +271,47 @@ module ShapeUtils
 private
 
 =begin
+  ==ShapeUtils:corner_radius
+  Will determine rectangular tubing corner radius based on perimeter & thickness
+=end
+  def corner_radius
+    diag_section("private method: calculating corner radius")
+    
+    if $radius_factors.key?(@t)
+      @ra = BigDecimal.new("#{$radius_factors[@t]}")
+      diag_line("radius was calculated")
+    else
+      @ra = BigDecimal.new("0.03125")
+      diag_line("radius could not be calculated: using default value")
+    end #if
+
+#    equiv_diam = (((@x * 2) + (@y * 2)) / Pi)
+#    diag_line("equivalent diameter:   #{equiv_diam.round(4)}, #{equiv_diam.class}")
+    diag_line("@radius:                #{@ra.to_f.to_s}, #{@ra.class}")
+  end #def corner_radius
+
+
+=begin
   ==ShapeUtils::gauge_converter
   This method examines the @t (thickness) variable to see if it is a decimal number or a gauge number.
   @t > 1 are converted to the decimal number equivalents via a case statement.
   @t < 1 are kept as is
 =end
   def gauge_converter
-    @t = $gauge_factors[@t].to_d
+    diag_section("private method: running the gauge converter")    
     
-    diag_test {diag_section("private method: running gauge converter")}
-    diag_test {diag_line("@thickness:   #{t}, #{@t.class}")}
-  end #def gauge_converter
+    if $gauge_factors.key?(@t)
+      @t = BigDecimal.new("#{$gauge_factors[@t]}")
+      puts "gauge was converted from AWG to decimal"
+    else
+      @t = BigDecimal.new(@t)
+      puts "decimal gauge provided"
+    end #if
 
-=begin
-  ==ShapeUtils:corner_radius
-  Will determine rectangular tubing corner radius based on perimeter & thickness
-=end
-  def corner_radius
-    equiv_diam = (((@x * 2) + (@y * 2)) / Pi)
-
-#    @ra = 0.03125.to_d
-#    if equiv_diam === (0.5...2)
-#      @ra = "0.03125".to_d
-#      #if @t.to_f.to_s# == "0.022"
-#    end #if
-
-    diag_section("private method: calculating corner radius")
-    diag_line("equivalent diameter:   #{equiv_diam.round(4)}, #{equiv_diam.class}")
     diag_line("@thickness:             #{@t.to_f.to_s}, #{@t.class}")
-    diag_line("@radius:                #{@ra.to_f.to_s}, #{@ra.class}")
-    diag_line("")
-
-  end #def
-
+  end #def gauge_converter
+  
+  
 end #ShapeUtils
 
 #########################
@@ -390,18 +404,19 @@ class Square_tube
 
   include ShapeUtils
 
-  def initialize(x, t, ra)
+  def initialize(x, t)
     diag_class
 
     @x = x.to_s.to_d
     @y = @x.to_s.to_d
     @t = t.to_i
-    @ra = ra.to_d
+#    @ra = 1
 #    @ra = BigDecimal.new("0")
 
     #use ShapeUtils methods to get more dimensions
-    gauge_converter
+
     corner_radius
+    gauge_converter
 
     @a = BigDecimal.new("0")
     @i = BigDecimal.new("0")
@@ -677,9 +692,12 @@ end #class Rod
 ########################
 ###   Testing Area   ###
 ########################
+include ShapeUtils
+
+#  columns_header
+  Square_tube.new(1, 18)
 
 #  Round_tube.new(4, 18).props
-  Square_tube.new(1, 20, 0.04675).props
 #  Rec_tube.new(1.0, 3.0, 0.065, 0.005).props
 #  Bar.new(5.0).props
 #  Plate.new(4, 5).props

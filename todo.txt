@@ -1,68 +1,22 @@
 #Shapes Library info file
+FIXME
 =begin
 
-== Todo list ==
-  
-  TODO: complete the corner radius decision tree
-        var: equiv. diameter
-        var: wall thickness (in inches)
-          24ga  1/64    3/64
-            1/2" to 1 1/2"
-          22ga  3/32
-            1/2 to 1 1/2"
-          20ga  3/32
-            1/2 tp 2 1/2
-          19ga  1/16
-            1/2 to 2 1/2
-          18ga  3/64  1/16  5/64
-            1/2 to 4
-          16ga  4/64  -  7/64
-            1/2 to 4 1/8
-          14ga  5/64  -  1/8
-            3/4 to 4 1/8
-          14ga  3/16  -  5/15
-            4 1/8 to 6
-          13ga  3/32  -  5/32
-            1 to 4 1/8
-          13ga  3/16  -  5/16
-            4 1/8 to 6
-          12ga  1/8   -  13/64
-            1 1/4 to 4
-          12ga  3/16  -  5/16
-            4 to 6
-          11ga  1/8   -  13/64
-            1 1/4 to 4
-          11ga  7/32  -  7/16
-            4 to 6
-          10ga  5/32  -  9/32
-            2 to 4
-          10ga  7/32  -  7/16
-            4 to 6
-          9ga   3/16  -  5/16
-            2 to 4
-          9ga   7/32  -  7/16
-            4 to 8
-          8ga   1/4   -  1/2
-            2 to 8
-          7ga   1/4   -  1/2
-            2 to 8
-          6ga   5/16  -  9/16
-            2 1/2 to 4
-          6ga   5/16  -  9/16
-            4 to 8
-          5ga   3/8   -  5/8
-            2 1/2 to 8
-          4ga   3/8   -  5/8
-            2 1/2 to 8
-          3ga   3/8   -  5/8
-            2 1/2 to 8
-          
+  FIXME: finish implimenting the ShapeUtils::corner_radius method
+        -as of now it calculates when thickness is a gauge, not a decimal
+  FIXME: Rectangular tubing accuracy is off just a little bit?
+          -precision in the millionths seems to be off - determine where it is failing
+          -seems to be affecting I, S, & R values (check others)
+  FIXME: Fix rectangular tubing math (IT IS BROKEN) & verify
+  FIXME: Bar class returns odd I values to bar.props, alo S & R are broken
+  FIXME: Fix bar math & verify - only guestimates
+
+=end
+
+TODO
+=begin
+
   TODO: create ShapeUtils::pipe_converter method, same as gauge_converter, based on schedule system
-  TODO: create ShapeUtils::corner_radius method to automatically determine radius of corners
-        -method:
-          -use a case table to find the radius that is correct for the thickness and perimeter
-          -save the result to the @ra variable
-        -remove ra variable from ShapeClass.new invocation 
   TODO: Create testing method/module/mixin to verify math and return a pass/fail
         -Manually enter several accurate results (through range of sizes) w/ corresponding inputs?
         -Check that calculations == accurate results
@@ -72,37 +26,77 @@
         -this would allow several methods to move from Shape specific classes to the ShapeUtils module
         -Hash, BigHash
   TODO: Merge Rec_tubing and Square_tubing class?
+  
+=end
 
-  FIXME: Rectangular tubing accuracy is off just a little bit?
-          -precision in the millionths seems to be off - determine where it is failing
-          -seems to be affecting I, S, & R values (check others)
-  FIXME: Fix rectangular tubing math (IT IS BROKEN) & verify
-  FIXME: Bar class returns odd I values to bar.props, alo S & R are broken
-  FIXME: Fix bar math & verify - only guestimates
+REFERENCE
+=begin
+  corner radius values
+    24ga  1/64    3/64
+      1/2" to 1 1/2"
+      
+    22ga  3/32
+      1/2 to 1 1/2"
 
+    20ga  3/32
+      1/2 tp 2 1/2
 
-== Version History ==
+    19ga  1/16
+      1/2 to 2 1/2
 
-v 0.2.6 - current
-    VERIFIED: Round tube calculations are accurate! 
-    ADDED: ShapeUtils:gauge_converter now pulls values from a $gauge_factors hash
-    ADDED: Diagnostic label system, uses an 'if DIAGNOSTICS = "on"' test to determine whether to print or not
-    TODO: Fix the corner radius decision tree
+    18ga  3/64  1/16  5/64
+      1/2 to 4
 
-v 0.2.5.4
-    ADDED: Added round bar stuff - math has not been verified
-    ADDED: Diagnostic flag - $diagnostics (on/off)
-    ADDED: Diagnostic methods & such, .label
+    16ga  4/64  -  7/64
+      1/2 to 4 1/8
 
-v 0.2.5.3
-    ADDED: new file - todo.txt (this file) - migrated contents from shapes.rb
-    ADDED: more values to gauge_converter. Now includes 0000ga. through 30ga.
-    RENAMED: ShapeUtils::test_vars to ShapeUtils::var_classes
-    FIXED: var_classes code
-    ADDED: ShapeUtils::var_values
+    14ga  5/64  -  1/8
+      3/4 to 4 1/8
+    14ga  3/16  -  5/15
+      4 1/8 to 6
 
-v 0.2.5.2
-    ADDED: add ability to use gauges as input arguments as well as decimal thicknesses uses the Printer.gauge_converter method
+    13ga  3/32  -  5/32
+      1 to 4 1/8
+    13ga  3/16  -  5/16
+      4 1/8 to 6
 
-v 0.2.5
-    ADDED: let attributes be entered without trailing zeros & a decimal point
+    12ga  1/8   -  13/64
+      1 1/4 to 4
+    12ga  3/16  -  5/16
+      4 to 6
+
+    11ga  1/8   -  13/64
+      1 1/4 to 4
+    11ga  7/32  -  7/16
+      4 to 6
+
+    10ga  5/32  -  9/32
+      2 to 4
+    10ga  7/32  -  7/16
+      4 to 6
+
+    9ga   3/16  -  5/16
+      2 to 4
+    9ga   7/32  -  7/16
+      4 to 8
+
+    8ga   1/4   -  1/2
+      2 to 8
+
+    7ga   1/4   -  1/2
+      2 to 8
+
+    6ga   5/16  -  9/16
+      2 1/2 to 4
+    6ga   5/16  -  9/16
+      4 to 8
+
+    5ga   3/8   -  5/8
+      2 1/2 to 8
+
+    4ga   3/8   -  5/8
+      2 1/2 to 8
+
+    3ga   3/8   -  5/8
+      2 1/2 to 8
+=end
