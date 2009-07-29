@@ -2,7 +2,7 @@
 =begin
 
 ###################################
-###   Shapes Library v 0.2.6    ###
+###   Shapes Library v 0.2.7    ###
 ###      Matthew D. Jordan      ###
 ###     www.scenic-shop.com     ###
 ### shared under the GNU GPLv3  ###
@@ -11,8 +11,6 @@
 Library Structure
 -----------------
   each shape object (cross section to analyze) will be an instance of that shape's class
-  Class Round_tube(od, thickness)
-    .initialize
 
   Class objects
     round_tube
@@ -22,16 +20,28 @@ Library Structure
     bar
     plate
 
-  Class ShapeUtils - i/o of calculated shape data
-    .props
-    .bigprops
-    .hash
-    .bighash
-    .test_object
-    .var_classes
-    .var_values
-    .columns -> BROKEM
-    .gauge_converter
+  OutputUtils Module - output of calculated data
+    props
+    bigprops
+    hash
+    bighash
+    columns_header
+    columns
+    
+  ShapeUtils Module - calculation tools
+    Float
+    corner_radius
+    gague_converter
+
+  DiagUtils Module - diagnostic outputs
+    diag_test
+    diag_section
+    diag_line
+    diag_class
+    test_object
+    var_classes
+    var_values
+    gauge_converter
 
 =end
 
@@ -49,21 +59,19 @@ $radius_factors = { 20=>"0.04675", 19=>"0.0625", 18=>"0.0625" }
 DIAGNOSTICS = "on"
 
 
-#############################
-###   ShapeUtils Module   ###
-#############################
+############################
+###   DiagUtils Module   ###
+############################
 
 =begin
-
-  ==ShapeUtils
-  this module handles i/o of the calculated shape values
-  note: all Shape classes mixin this ShapeUtils Class
-
+  ==DiagUtils
+  this module handles Diagnostic messages
+  note: all Shape classes mixin this module
 =end
-module ShapeUtils
+module DiagUtils
 
 =begin
-  ==ShapeUtils:diag_test
+  ==DiagUtils:diag_test
   Tests for DIAGNOSTICS == "on", yields if true
 =end
   def diag_test
@@ -73,7 +81,7 @@ module ShapeUtils
   end #def diag_section
 
 =begin
-  ==ShapeUtils:diag_section
+  ==DiagUtils:diag_section
   Outputs a formated label to the screen.  Used for testing and debugging
 =end
   def diag_section(arg)
@@ -84,7 +92,7 @@ module ShapeUtils
   end #def diag_section
 
 =begin
-  ==ShapeUtils:diag_line
+  ==DiagUtils:diag_line
   Outputs a formated label to the screen.  Used for testing and debugging
 =end
   def diag_line(arg)
@@ -94,7 +102,7 @@ module ShapeUtils
   end #def diag_line
 
 =begin
-  ==ShapeUtils:diag_class
+  ==DiagUtils:diag_class
   Outputs a diagnostic class label.  Used for testing and debugging
 =end
   def diag_class
@@ -104,70 +112,6 @@ module ShapeUtils
     end #if
   end #def diag_class
 
-=begin
-  ==ShapeUtils::props
-    #prints rounded (4 places) attributes as floats.  Normally will print all attributes or those specified with obj.props("attribute")
-=end
-  def props(arg="list")
-
-    diag_section(".props: printing shape properties")
-    if arg == "list"
-      @hash.each {|key, value| puts "#{key}:  #{value}\n"}
-    else
-      puts @hash["#{arg}"]
-    end #if
-  end #def props
-
-=begin
-  ==ShapeUtils::bigprops
-  #prints the complete attributes as bigdecimals.   Normally will print all attributes or those specified with obj.bigprops("attribute")
-=end
-  def bigprops(arg='i')
-    diag_section(".bigprops: printing shape properties")
-
-    if arg == 'i'
-      @bighash.each {|key, value| puts "#{key}:  #{value}\n"}
-      else  
-      puts @bighash["#{arg}"]
-    end #if
-  end #def bigprops
-  
-=begin
-  ==ShapeUtils::hash
-  #returns a hash of the attributes (rounded to 4 places, as floats.)
-=end
-  def hash
-    diag_section(".hash: printing shape properties hash")
-
-    @hash
-  end #def hash
-
-=begin
-  ==ShapeUtils::bighash
-  #returns a hash of the attributes (as bigdecimals.)  
-=end
-  def bighash
-    diag_section(".bighash: printing shape properties hash")
-
-    @bighash
-  end #def bighash
-  
-=begin
-  ==ShapeUtils::columns_header
-=end
-  def columns_header
-    puts "d    t      a       w       i       s       r"
-  end #def columns_header
-
-=begin
-  ==ShapeUtils::columns
-  # FIXME: fix the column method, collapse into an orderly single line
-=end
-  def columns
-    diag_section(".columns: printing shape properties in column format")
-    puts "#{@x.round(4).to_f}  #{@t.round(4).to_f}  #{@a.round(4).to_f}  #{@w.round(4).to_f}  #{@i.round(4).to_f}  #{@s.round(4).to_f}  #{@r.round(4).to_f}"
-  end #def columns
-  
 =begin
   ==ShapeUtils::test_shape
   #test individual shape objects and return results
@@ -236,27 +180,121 @@ module ShapeUtils
   puts the instance variables' values
 =end
   def var_values
-    if DIAGNOSTICS == "on"
       diag_section("diagnostic: variable values")
-      p "x:    #{@x}"
-      p "y:    #{@y}"
-      p "t:    #{@t}"
-      p "ed:   #{@equiv_diameter}"
-      p "ra:   #{@ra}"
-      p "a:    #{@a}"
-      p "i:    #{@i}"
-      p "i_x:  #{@i_x}"
-      p "i_y:  #{@i_y}"
-      p "s:    #{@s}"
-      p "s_x:  #{@s_x}"
-      p "s_y:  #{@s_y}"
-      p "r:    #{@r}"
-      p "r_x:  #{@r_x}"
-      p "r_y:  #{@r_y}"
-      p "w:    #{@w}"
-      p "Pi:   #{Pi}"
-    end #if
+      p "x:    #{@x.to_f}  #{@x.class}"
+      p "y:    #{@y.to_f}  #{@y.class}"
+      p "t:    #{@t.to_f}  #{@t.class}"
+      p "ed:   #{@equiv_diameter.to_f}  #{@equiv_diameter.class}"
+      p "ra:   #{@ra.to_f}  #{@ra.class}"
+      p "a:    #{@a.to_f}  #{@a.class}"
+      p "i:    #{@i.to_f}  #{@i.class}"
+      p "i_x:  #{@i_x.to_f}  #{@i_x.class}"
+      p "i_y:  #{@i_y.to_f}  #{@i_y.class}"
+      p "s:    #{@s.to_f}  #{@s.class}"
+      p "s_x:  #{@s_x.to_f}  #{@s_x.class}"
+      p "s_y:  #{@s_y.to_f}  #{@s_y.class}"
+      p "r:    #{@r.to_f}  #{@r.class}"
+      p "r_x:  #{@r_x.to_f}  #{@r_x.class}"
+      p "r_y:  #{@r_y.to_f}  #{@r_y.class}"
+      p "w:    #{@w.to_f}  #{@w.class}"
+      p "Pi:   #{Pi.to_f}  #{@Pi.class}"
   end #def var_values
+
+end #module DiagUtils
+
+
+##############################
+###   OutputUtils Module   ###
+##############################
+
+=begin
+
+  ==OutputUtils
+  this module handles i/o of the calculated shape values
+  note: all Shape classes mixin this module
+
+=end
+module OutputUtils
+
+=begin
+  ==OutputUtils::props
+    #prints rounded (4 places) attributes as floats.  Normally will print all attributes or those specified with obj.props("attribute")
+=end
+  def props(arg="list")
+
+    diag_section(".props: printing shape properties")
+    if arg == "list"
+      @hash.each {|key, value| puts "#{key}:  #{value.to_f}\n"}
+    else
+      puts @hash["#{arg}"].to_f
+    end #if
+  end #def props
+
+=begin
+  ==OutputUtils::bigprops
+  #prints the complete attributes as bigdecimals.   Normally will print all attributes or those specified with obj.bigprops("attribute")
+=end
+  def bigprops(arg='i')
+    diag_section(".bigprops: printing shape properties")
+
+    if arg == 'i'
+      @bighash.each {|key, value| puts "#{key}:  #{value}\n"}
+      else  
+      puts @bighash["#{arg}"]
+    end #if
+  end #def bigprops
+  
+=begin
+  ==OutputUtils::hash
+  #returns a hash of the attributes (rounded to 4 places, as floats.)
+=end
+  def hash
+    diag_section(".hash: returning @hash")
+    @hash
+  end #def hash
+
+=begin
+  ==OutputUtils::bighash
+  #returns a hash of the attributes (as bigdecimals.)  
+=end
+  def bighash
+    diag_section(".bighash: printing shape properties hash")
+
+    @bighash
+  end #def bighash
+  
+=begin
+  ==OutputUtils::columns_header
+=end
+  def columns_header
+    puts ""
+    puts "d    t      a       w       i       s       r"
+  end #def columns_header
+
+=begin
+  ==OutputUtils::columns
+  # FIXME: fix the column method, collapse into an orderly single line
+=end
+  def columns
+    diag_section(".columns: printing shape properties in column format")
+    puts "#{@x.round(4).to_f}  #{@t.round(4).to_f}  #{@a.round(4).to_f}  #{@w.round(4).to_f}  #{@i.round(4).to_f}  #{@s.round(4).to_f}  #{@r.round(4).to_f}"
+  end #def columns
+
+end #OutputUtils
+
+
+#############################
+###   ShapeUtils Module   ###
+#############################
+
+=begin
+
+  ==ShapeUtils
+  this module handles i/o of the calculated shape values
+  note: all Shape classes mixin this module
+
+=end
+module ShapeUtils
 
 =begin
   ==Float::to_d
@@ -267,8 +305,6 @@ module ShapeUtils
       BigDecimal(self.to_s)
     end #def to_d
   end #class Float
-
-private
 
 =begin
   ==ShapeUtils:corner_radius
@@ -290,7 +326,6 @@ private
     diag_line("@radius:                #{@ra.to_f.to_s}, #{@ra.class}")
   end #def corner_radius
 
-
 =begin
   ==ShapeUtils::gauge_converter
   This method examines the @t (thickness) variable to see if it is a decimal number or a gauge number.
@@ -302,17 +337,17 @@ private
     
     if $gauge_factors.key?(@t)
       @t = BigDecimal.new("#{$gauge_factors[@t]}")
-      puts "gauge was converted from AWG to decimal"
+      diag_line("gauge was converted from AWG to decimal")
     else
       @t = BigDecimal.new(@t)
-      puts "decimal gauge provided"
+      diag_line("decimal gauge provided")
     end #if
 
     diag_line("@thickness:             #{@t.to_f.to_s}, #{@t.class}")
   end #def gauge_converter
-  
-  
+
 end #ShapeUtils
+
 
 #########################
 ###   Shape Classes   ###
@@ -339,8 +374,7 @@ a round_rube object is part of the shape class
 =end
 class Round_tube
   attr_accessor :d, :t, :a, :i, :s, :r, :w
-  
-  include ShapeUtils
+  include ShapeUtils; include DiagUtils; include OutputUtils
 
   def initialize(d, t)  
     diag_class
@@ -401,37 +435,30 @@ Class Square_tube(od, thickness, radius)
 =end
 class Square_tube
   attr_accessor :x, :y, :t, :a, :i, :s, :r, :w, :ra
-
-  include ShapeUtils
-
+  include ShapeUtils; include DiagUtils; include OutputUtils
+    
   def initialize(x, t)
     diag_class
 
     @x = x.to_s.to_d
     @y = @x.to_s.to_d
     @t = t.to_i
-#    @ra = 1
-#    @ra = BigDecimal.new("0")
-
-    #use ShapeUtils methods to get more dimensions
-
-    corner_radius
-    gauge_converter
-
-    @a = BigDecimal.new("0")
+#    @a = BigDecimal.new("0")
     @i = BigDecimal.new("0")
     @s = BigDecimal.new("0")
     @r = BigDecimal.new("0")
     @w = BigDecimal.new("0")
 
+    corner_radius
+    gauge_converter
+
     #calculate Square Area
     @a = (@t * ((4 * @x) - (8 * @ra) + ( Pi * (2*@ra - @t) ) ))
 
     #calculate Second Moment of Area (I)
-
     @i = ((@t**3 * (@x - 2 * @ra))/6 + 2 * @t * (@x - 2 * @ra) * ((@x - @t)/2)**2 + (@t * (@x - 2 * @ra)**3)/6 + (Pi/4 - 8/(4.5 * Pi)) * (@ra**4 - (@ra - @t)**4) - ( 8 * @t * @ra**2 * (@ra - @t)**2)/(4.5 * Pi * (2 * @ra - @t)) + Pi * @t * (2 * @ra - @t) * (@x/2 - @ra + (4 * (ra**3 - (@ra - @t)**3))/(3 * Pi * (@ra**2 - (@ra - @t)**2)))**2).to_d
-    #Section Modulus
 
+    #Section Modulus
     @s = ((2 * @i)/@x)
 
     #Radius of Gyration
@@ -461,10 +488,9 @@ Methods
 
 =end
 class Rec_tube
-  attr_accessor :x, :y, :t, :ra, :a, :i_x, :i_y, :s_x, :s_y, :r_x, :r_y, :w
-  
-  include ShapeUtils
-  
+  attr_accessor :x, :y, :t, :ra, :a, :i_x, :i_y, :s_x, :s_y, :r_x, :r_y, :w  
+  include ShapeUtils; include DiagUtils; include OutputUtils
+    
   private
   
   def initialize(x, y, t, ra)  
@@ -561,7 +587,7 @@ FIXME: Check Math, guestimated most of it
 =end
 class Bar
   attr_accessor :x, :a, :i, :s, :r, :w
-  include ShapeUtils
+  include ShapeUtils; include DiagUtils; include OutputUtils
   
   def initialize(x)
     diag_class    
@@ -608,7 +634,7 @@ FIXME: Check Math, guestimated most of it
 =end
 class Plate
   attr_accessor :x, :y, :a, :i_x, :i_y, :s_x, :s_y, :r_x, :r_y, :w
-  include ShapeUtils
+  include ShapeUtils; include DiagUtils; include OutputUtils
   
   def initialize(x, y)  
     diag_class
@@ -655,7 +681,7 @@ Class Rod(d)
 =end
 class Rod
   attr_accessor :x, :a, :i, :s, :r, :w
-  include ShapeUtils
+  include ShapeUtils; include DiagUtils; include OutputUtils
   
   def initialize(x)
     diag_class
@@ -689,13 +715,20 @@ class Rod
   end #def init
 end #class Rod
 
+
 ########################
 ###   Testing Area   ###
 ########################
-include ShapeUtils
+include ShapeUtils; include DiagUtils; include OutputUtils
 
+#  Square_tube.new(1, 18).props("t")
+#  Square_tube.new(1, 18).props
+#  Square_tube.new(1, 18).bigprops("t")
+#  Square_tube.new(1, 18).bigprops
+#  Square_tube.new(1, 18).hash
+#  Square_tube.new(1, 18).bighash
 #  columns_header
-  Square_tube.new(1, 18)
+  Square_tube.new(1, 20).var_values
 
 #  Round_tube.new(4, 18).props
 #  Rec_tube.new(1.0, 3.0, 0.065, 0.005).props
