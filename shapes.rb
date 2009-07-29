@@ -44,6 +44,7 @@ include BigMath
 #Constants
 Pi = BigDecimal.PI(20)
 $gauge_factors = {30=>0.012, 29=>0.013, 28=>0.014, 27=>0.016, 26=>0.018, 25=>0.020, 24=>0.022, 23=>0.025, 22=>0.028, 21=>0.032, 20=>0.035, 18=>0.049, 16=>0.065, 14=>0.083, 13=>0.095, 12=>0.109, 11=>0.120, 10=>0.134, 9=>0.148, 8=>0.165, 7=>0.180, 6=>0.203, 5=>0.220, 4=>0.238, 3=>0.259, 2=>0.284, 1=>0.300, 0=>0.34, 00=>0.38, 000=>0.425, 0000=>0.454}
+$radius_factors = {20=>0.04675, 18=>0.09}
 
 DIAGNOSTICS = "on"
 
@@ -66,10 +67,10 @@ module ShapeUtils
   Tests for DIAGNOSTICS == "on", yields if true
 =end
   def diag_test
-  if DIAGNOSTICS == "on"
-    yield
-  end #if
-end #def diag_section
+    if DIAGNOSTICS == "on"
+      yield
+    end #if
+  end #def diag_section
 
 =begin
   ==ShapeUtils:diag_section
@@ -157,8 +158,8 @@ end #def diag_section
 =end
   def columns
     diag_section(".columns: printing shape properties in column format")
-
-    @hash.each {|key, value| p "#{value}"}
+    puts "#{@x.round(4)}  #{@t.round(4)}  #{@a.round(4)}  #{@w.round(4)}  #{@i.round(4)}  #{@s.round(4)}  #{@r.round(4)}"
+#    @hash.each {|key, value| p "#{value}"}
   end #def columns
   
 =begin
@@ -393,7 +394,7 @@ class Square_tube
     diag_class
 
     @x = x.to_s.to_d
-    @y = @x
+    @y = @x.to_s.to_d
     @t = t.to_i
     @ra = ra.to_d
 #    @ra = BigDecimal.new("0")
@@ -412,29 +413,10 @@ class Square_tube
     @a = (@t * ((4 * @x) - (8 * @ra) + ( Pi * (2*@ra - @t) ) ))
 
     #calculate Second Moment of Area (I)
-    temp = BigDecimal.new("0")
-    temp = ((@t**3*(@x-(2*@ra)))/6)
-    temp = temp + (( 2 * @t * ( @x - ( 2 * @ra ))) * (( @x - @t ) / 2 )**2)
-    temp = temp + (@t * ((@x-(2*@ra))**3)) /6
-    temp = temp + (( Pi / 4 ) - 8 / ( ( 9 / 2 ) * Pi ) ) * ((@ra**4)-((@ra-@t)**4))
-    temp = temp - (( 8 * @t ) * ( @ra**2 ) * ( @ra - @t ) ** 2 ) / ( (9/2) * ( Pi * (( 2 * @ra ) - @t )))
 
-    temp2 = BigDecimal.new("0")
-
-    b = BigDecimal.new("0")
-    c = BigDecimal.new("0")
-    x = BigDecimal.new("0")
-    w = BigDecimal.new("0")
-    #These fuckers all string together to make the last chunk of the formula
-    w = 4 * (@ra**3 - ((@ra-@t)**3))
-    x = (3 * Pi) * ((@ra**2) - ((@ra-@t)**2))
-    b = ((Pi*@t) * ((2*@ra)-@t) )
-    c = ((@x/2) - @ra + (@w/x))**2
-    temp2 = b * c
-
-    @i = temp + temp2
-
+    @i = ((@t**3 * (@x - 2 * @ra))/6 + 2 * @t * (@x - 2 * @ra) * ((@x - @t)/2)**2 + (@t * (@x - 2 * @ra)**3)/6 + (Pi/4 - 8/(4.5 * Pi)) * (@ra**4 - (@ra - @t)**4) - ( 8 * @t * @ra**2 * (@ra - @t)**2)/(4.5 * Pi * (2 * @ra - @t)) + Pi * @t * (2 * @ra - @t) * (@x/2 - @ra + (4 * (ra**3 - (@ra - @t)**3))/(3 * Pi * (@ra**2 - (@ra - @t)**2)))**2).to_d
     #Section Modulus
+
     @s = ((2 * @i)/@x)
 
     #Radius of Gyration
@@ -696,8 +678,8 @@ end #class Rod
 ###   Testing Area   ###
 ########################
 
-  Round_tube.new(4, 18).props
-#  Square_tube.new(3, 18, 0.0625).props
+#  Round_tube.new(4, 18).props
+  Square_tube.new(1, 20, 0.04675).props
 #  Rec_tube.new(1.0, 3.0, 0.065, 0.005).props
 #  Bar.new(5.0).props
 #  Plate.new(4, 5).props
