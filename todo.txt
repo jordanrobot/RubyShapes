@@ -3,14 +3,98 @@ FIXME
 =begin
 
   FIXME: finish implimenting the ShapeUtils::corner_radius method
-        -as of now it calculates when thickness is a gauge, not a decimal
+
+    if $radius_factors.key?(@t)
+      @ra = BigDecimal.new("#{$radius_factors[@t]}")
+    else
+      @ra = BigDecimal.new("0.03125")
+    end #if
+
+    look for a key that matches @t within $radius factors
+    if found, return the corresponding value
+        ##this is only working with gauges, not decimal thickness right now
+
+solution #1
+    turn gauge into decimal first
+    look for a key that is within a certain tolerance
+      t_upper = @t + 0.0005; t_lower = @t - 0.0005
+
+$gauge_factors = {
+
+    30=>0.012 
+            ∆ 0.001
+    29=>0.013 
+            ∆ 0.001
+    28=>0.014
+            ∆ 0.002
+    27=>0.016
+            ∆ 0.002
+    26=>0.018
+            ∆ 0.002
+    25=>0.020
+            ∆ 0.002
+    24=>0.022
+            ∆ 0.003
+    23=>0.025
+            ∆ 0.003
+    22=>0.028
+            ∆ 0.004
+    21=>0.032
+            ∆ 0.003
+    20=>0.035
+            ∆ 0.007
+<<<<19=>0.042
+            ∆ 0.007           
+    18=>0.049
+            ∆ 0.009
+<<<<17=>0.058
+            ∆ 0.007
+    16=>0.065
+            ∆ 0.018
+    14=>0.083
+            ∆ 0.012
+    13=>0.095
+            ∆ 0.014
+    12=>0.109
+            ∆ 0.011
+    11=>0.120
+            ∆ 0.014
+    10=>0.134
+            ∆ 0.014
+    09=>0.148
+            ∆ 0.017
+    08=>0.165
+            ∆ 0.015
+    07=>0.180
+            ∆ 0.023
+    06=>0.203
+            ∆ 0.017
+    05=>0.220
+            ∆ 0.018
+    04=>0.238
+            ∆ 0.021
+    03=>0.259
+            ∆ 0.025
+    02=>0.284
+            ∆ 0.016
+    01=>0.300
+            ∆ 0.04
+      0=>0.34
+            ∆ 0.04
+     00=>0.38
+            ∆ 0.045
+   000=>0.425
+            ∆ 0.029
+  0000=>0.454 }
+
+
   FIXME: Rectangular tubing accuracy is off just a little bit?
           -precision in the millionths seems to be off - determine where it is failing
           -seems to be affecting I, S, & R values (check others)
   FIXME: Fix rectangular tubing math (IT IS BROKEN) & verify
   FIXME: Bar class returns odd I values to bar.props, alo S & R are broken
   FIXME: Fix bar math & verify - only guestimates
-
+calc
 =end
 
 TODO
@@ -32,71 +116,71 @@ TODO
 REFERENCE
 =begin
   corner radius values
-    24ga  1/64    3/64
+    24ga  1/64  0.03125  3/64
       1/2" to 1 1/2"
       
-    22ga  3/32
+    22ga  0.09375
       1/2 to 1 1/2"
 
-    20ga  3/32
+    20ga  0.09375
       1/2 tp 2 1/2
 
-    19ga  1/16
+    19ga  0.0625
       1/2 to 2 1/2
 
-    18ga  3/64  1/16  5/64
+    18ga  3/64  0.0625  5/64
       1/2 to 4
 
-    16ga  4/64  -  7/64
+    16ga  4/64  0.0859375  7/64
       1/2 to 4 1/8
 
-    14ga  5/64  -  1/8
+    14ga  5/64  0.1015625  1/8
       3/4 to 4 1/8
-    14ga  3/16  -  5/15
+    14ga  3/16  1/4  5/15
       4 1/8 to 6
 
-    13ga  3/32  -  5/32
+    13ga  3/32  0.125  5/32
       1 to 4 1/8
-    13ga  3/16  -  5/16
+    13ga  3/16  0.25  5/16
       4 1/8 to 6
 
-    12ga  1/8   -  13/64
+    12ga  1/8   0.1640625  13/64
       1 1/4 to 4
-    12ga  3/16  -  5/16
+    12ga  3/16  0.25  5/16
       4 to 6
 
-    11ga  1/8   -  13/64
+    11ga  1/8   0.1640625  13/64
       1 1/4 to 4
-    11ga  7/32  -  7/16
+    11ga  7/32  0.328125  7/16
       4 to 6
 
-    10ga  5/32  -  9/32
+    10ga  5/32  0.21875  9/32
       2 to 4
-    10ga  7/32  -  7/16
+    10ga  7/32  0.328125  7/16
       4 to 6
 
-    9ga   3/16  -  5/16
+    9ga   3/16  0.25  5/16
       2 to 4
-    9ga   7/32  -  7/16
+    9ga   7/32  0.328125  7/16
       4 to 8
 
-    8ga   1/4   -  1/2
+    8ga   1/4   0.375  1/2
       2 to 8
 
-    7ga   1/4   -  1/2
+    7ga   1/4   0.375  1/2
       2 to 8
 
-    6ga   5/16  -  9/16
+    6ga   5/16  0.4375  9/16
       2 1/2 to 4
-    6ga   5/16  -  9/16
+    6ga   5/16  0.4375  9/16
       4 to 8
 
-    5ga   3/8   -  5/8
+    5ga   3/8   0.5  5/8
       2 1/2 to 8
 
-    4ga   3/8   -  5/8
+    4ga   3/8   0.5  5/8
       2 1/2 to 8
 
-    3ga   3/8   -  5/8
+    3ga   3/8   0.5  5/8
       2 1/2 to 8
 =end
