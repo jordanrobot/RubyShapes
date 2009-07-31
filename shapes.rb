@@ -1,48 +1,11 @@
 #!/usr/bin/env ruby
 =begin
-
 ###################################
-###   Shapes Library v 0.2.7    ###
+###   Shapes Library v 0.2.8    ###
 ###      Matthew D. Jordan      ###
 ###     www.scenic-shop.com     ###
 ### shared under the GNU GPLv3  ###
 ###################################
-
-Library Structure
------------------
-  each shape object (cross section to analyze) will be an instance of that shape's class
-
-  Class objects
-    round_tube
-    square_tube
-    rectangular tubing
-    rod
-    bar
-    plate
-
-  OutputUtils Module - output of calculated data
-    props
-    bigprops
-    hash
-    bighash
-    columns_header
-    columns
-    
-  ShapeUtils Module - calculation tools
-    Float
-    corner_radius
-    gague_converter
-
-  DiagUtils Module - diagnostic outputs
-    diag_test
-    diag_section
-    diag_line
-    diag_class
-    test_object
-    var_classes
-    var_values
-    gauge_converter
-
 =end
 
 #require 'profile'
@@ -56,7 +19,7 @@ Pi = BigDecimal.PI(20)
 $gauge_factors = { 30=>0.012, 29=>0.013, 28=>0.014, 27=>0.016, 26=>0.018, 25=>0.020, 24=>0.022, 23=>0.025, 22=>0.028, 21=>0.032, 20=>0.035, 18=>0.049, 16=>0.065, 14=>0.083, 13=>0.095, 12=>0.109, 11=>0.120, 10=>0.134, 9=>0.148, 8=>0.165, 7=>0.180, 6=>0.203, 5=>0.220, 4=>0.238, 3=>0.259, 2=>0.284, 1=>0.300, 0=>0.34, 00=>0.38, 000=>0.425, 0000=>0.454 }
 $radius_factors = { 0.035=>"0.04675", 0.049=>"0.0625", 18=>"0.0625", 16=>"0.0859375" }
 
-DIAGNOSTICS = "on"
+DIAGNOSTICS = "off"
 
 
 ############################
@@ -69,16 +32,6 @@ DIAGNOSTICS = "on"
   note: all Shape classes mixin this module
 =end
 module DiagUtils
-
-=begin
-  ==DiagUtils:diag_test
-  Tests for DIAGNOSTICS == "on", yields if true
-=end
-  def diag_test
-    if DIAGNOSTICS == "on"
-      yield
-    end #if
-  end #def diag_section
 
 =begin
   ==DiagUtils:diag_section
@@ -154,8 +107,7 @@ module DiagUtils
   puts the classes of instance variables
 =end
   def var_classes
-    if DIAGNOSTICS == "on"
-      diag_section("Diagnostic: output variable classes")
+      p "---Diagnostic: output variable classes---"
       p "x:    #{@x.class}"
       p "y:    #{@y.class}"
       p "t:    #{@t.class}"
@@ -172,7 +124,6 @@ module DiagUtils
       p "r_y:  #{@r_y.class}"
       p "w:    #{@w.class}"
       p "Pi:   #{Pi.class}"
-    end #if
   end #def var_classes
 
 =begin
@@ -180,25 +131,27 @@ module DiagUtils
   puts the instance variables' values
 =end
   def var_values
-      diag_section("diagnostic: variable values")
-      p "x:    #{@x.to_f}  #{@x.class}"
-      p "y:    #{@y.to_f}  #{@y.class}"
-      p "t:    #{@t.to_f}  #{@t.class}"
-      p "ed:   #{@equiv_diameter.to_f}  #{@equiv_diameter.class}"
-      p "ra:   #{@ra.to_f}  #{@ra.class}"
-      p "a:    #{@a.to_f}  #{@a.class}"
-      p "i:    #{@i.to_f}  #{@i.class}"
-      p "i_x:  #{@i_x.to_f}  #{@i_x.class}"
-      p "i_y:  #{@i_y.to_f}  #{@i_y.class}"
-      p "s:    #{@s.to_f}  #{@s.class}"
-      p "s_x:  #{@s_x.to_f}  #{@s_x.class}"
-      p "s_y:  #{@s_y.to_f}  #{@s_y.class}"
-      p "r:    #{@r.to_f}  #{@r.class}"
-      p "r_x:  #{@r_x.to_f}  #{@r_x.class}"
-      p "r_y:  #{@r_y.to_f}  #{@r_y.class}"
-      p "w:    #{@w.to_f}  #{@w.class}"
-      p "Pi:   #{Pi.to_f}  #{@Pi.class}"
+      puts "---  Diagnostic: Variable Values  ---"
+      puts "   x:    #{@x.to_f}  #{@x.class}"
+      puts "   y:    #{@y.to_f}  #{@y.class}"
+      puts "   t:    #{@t.to_f}  #{@t.class}"
+      puts "   ed:   #{@equiv_diameter.to_f}  #{@equiv_diameter.class}"
+      puts "   ra:   #{@ra.to_f}  #{@ra.class}"
+      puts "   a:    #{@a.to_f}  #{@a.class}"
+      puts "   ix:  #{@i_x.to_f}  #{@i_x.class}"
+      puts "   iy:  #{@i_y.to_f}  #{@i_y.class}"
+      puts "   sx:  #{@s_x.to_f}  #{@s_x.class}"
+      puts "   sy:  #{@s_y.to_f}  #{@s_y.class}"
+      puts "   rx:  #{@r_x.to_f}  #{@r_x.class}"
+      puts "   ry:  #{@r_y.to_f}  #{@r_y.class}"
+      puts "   w:    #{@w.to_f}  #{@w.class}"
+      puts "   Pi:   #{Pi.to_f}  #{@Pi.class}"
   end #def var_values
+
+  def diag_all
+#    var_values
+#    self.inspect
+  end #diag_all
 
 end #module DiagUtils
 
@@ -262,7 +215,7 @@ module OutputUtils
 
     @bighash
   end #def bighash
-  
+
 =begin
   ==OutputUtils::columns_header
 =end
@@ -295,7 +248,7 @@ end #OutputUtils
 
 =end
 module ShapeUtils
-
+  
 =begin
   ==Float::to_d
   adds to_d method to Float class
@@ -311,7 +264,7 @@ module ShapeUtils
   Will determine rectangular tubing corner radius based on perimeter & thickness
 =end
   def corner_radius
-    diag_section("private method: calculating corner radius")
+    diag_section("Calculating Corner Radius")
     
     if $radius_factors.key?(@t)
       @ra = BigDecimal.new("#{$radius_factors[@t]}")
@@ -335,7 +288,7 @@ module ShapeUtils
   @t < 1 are kept as is
 =end
   def gauge_converter
-    diag_section("private method: running the gauge converter")    
+    diag_section("Gauge Conversion")    
     
     if $gauge_factors.key?(@t)
       @t = BigDecimal.new("#{$gauge_factors[@t]}")
@@ -346,8 +299,22 @@ module ShapeUtils
     end #if
 
     diag_line("@thickness:             #{@t.to_f.to_s}, #{@t.class}")
+    diag_line("")
   end #def gauge_converter
 
+=begin
+  ==ShapeUtils::weight
+  This method calculates the weight of the shape
+=end
+  def calc_weight
+         @w = 3.3996.to_d * @a
+  end #weight
+
+  def build_hash
+    @hash = {"x" => @x.round(4).to_f, "y" => @y.round(4).to_f, "a" => @a.round(4).to_f, "ix" => @ix.round(4).to_f, "iy" => @iy.round(4).to_f, "sx" => @sx.round(4).to_f, "sy" => @sy.round(4).to_f, "rx" => @rx.round(4).to_f, "ry" => @ry.round(4).to_f, "w" => @w.round(4).to_f }
+    @bighash = {"x" => @x, "y" => @y, "a" => @a, "ix" => @ix, "iy" => @iy, "sx" => @sx, "sy" => @sy, "rx" => @rx, "ry" => @ry, "w" => @w }
+  end #build_hash
+    
 end #ShapeUtils
 
 
@@ -363,7 +330,7 @@ Class Round_tube(od, thickness)
 
 a round_rube object is part of the shape class
   accepts 2 inputs via args
-    @d = outside diameter
+    @x = outside diameter
     @t = thickness of tubing
 
   calculates 5 instance variables from the input args
@@ -372,47 +339,35 @@ a round_rube object is part of the shape class
     @s - section modulus
     @r - radius of gyration
     @w - weight per foot
-
 =end
 class Round_tube
-  attr_accessor :d, :t, :a, :i, :s, :r, :w
+  attr_accessor :x, :y, :a, :ix, :iy, :sx, :sy, :rx, :ry, :w
   include ShapeUtils; include DiagUtils; include OutputUtils
 
-  def initialize(d, t)  
+  def initialize(x, t)  
     diag_class
 
-    @d = d.to_s.to_d
+    @x = @y = x.to_s.to_d
     @t = t.to_i
 
     gauge_converter
-    
-    #declare class Variables
-    @a = BigDecimal.new("0")
-    @i = BigDecimal.new("0")
-    @s = BigDecimal.new("0")
-    @r = BigDecimal.new("0")
-    @w = BigDecimal.new("0")
-    
+     
     #calculate Round tube Area
-     @a = (Pi*@t) * (@d-@t)
+    @a = (Pi*@t) * (@x-@t)
 
-     #calculate Second Moment of Area (I)
-     @i = Pi * (@d**4 - ((@d - (2*@t))**4 ))/64
+    #calculate Second Moment of Area (I)
+    @ix = @iy = Pi * (@x**4 - ((@x - (2*@t))**4 ))/64
 
-     #Calculate Round Tube Section Modulus
-     @s = (2*@i)/@d
+    #Calculate Round Tube Section Modulus
+    @sx = @sy = (2*@ix)/@x
 
-     #Calculate Round Tube Radius of Gyration 
-     @r = sqrt(@i/@a, 9)
+    #Calculate Round Tube Radius of Gyration 
+    @rx = @ry = sqrt(@ix/@a, 9)
 
-     #Calculate Round Tube Weight
-     @w = (BigDecimal.new("3.3996")*@a)
+    calc_weight
+    build_hash
+    diag_all
 
-     #add caculated values to a hash
-     @hash = {"d" => @d.round(4).to_f, "t" => @t.round(4).to_f, "a" => @a.round(4).to_f, "i" => @i.round(4).to_f, "s" => @s.round(4).to_f, "r" => @r.round(4).to_f, "w" => @w.round(4).to_f }
-     @bighash = {"d" => @d, "t" => @t, "a" => @a, "i" => @i, "s" => @s, "r" => @r, "w" => @w }
-
-     return "#{self} created"
   end #def init
 end #class Round_tube
 
@@ -436,20 +391,14 @@ Class Square_tube(od, thickness, radius)
 
 =end
 class Square_tube
-  attr_accessor :x, :y, :t, :a, :i, :s, :r, :w, :ra
+  attr_accessor :x, :y, :a, :ix, :iy, :sx, :sy, :rx, :ry, :w, :ra
   include ShapeUtils; include DiagUtils; include OutputUtils
     
   def initialize(x, t)
     diag_class
 
-    @x = x.to_s.to_d
-    @y = @x.to_s.to_d
+    @x = @y = x.to_s.to_d
     @t = t.to_i
-#    @a = BigDecimal.new("0")
-    @i = BigDecimal.new("0")
-    @s = BigDecimal.new("0")
-    @r = BigDecimal.new("0")
-    @w = BigDecimal.new("0")
 
     corner_radius
     gauge_converter
@@ -458,20 +407,17 @@ class Square_tube
     @a = (@t * ((4 * @x) - (8 * @ra) + ( Pi * (2*@ra - @t) ) ))
 
     #calculate Second Moment of Area (I)
-    @i = ((@t**3 * (@x - 2 * @ra))/6 + 2 * @t * (@x - 2 * @ra) * ((@x - @t)/2)**2 + (@t * (@x - 2 * @ra)**3)/6 + (Pi/4 - 8/(4.5 * Pi)) * (@ra**4 - (@ra - @t)**4) - ( 8 * @t * @ra**2 * (@ra - @t)**2)/(4.5 * Pi * (2 * @ra - @t)) + Pi * @t * (2 * @ra - @t) * (@x/2 - @ra + (4 * (ra**3 - (@ra - @t)**3))/(3 * Pi * (@ra**2 - (@ra - @t)**2)))**2).to_d
+    @ix = @iy = ((@t**3 * (@x - 2 * @ra))/6 + 2 * @t * (@x - 2 * @ra) * ((@x - @t)/2)**2 + (@t * (@x - 2 * @ra)**3)/6 + (Pi/4 - 8/(4.5 * Pi)) * (@ra**4 - (@ra - @t)**4) - ( 8 * @t * @ra**2 * (@ra - @t)**2)/(4.5 * Pi * (2 * @ra - @t)) + Pi * @t * (2 * @ra - @t) * (@x/2 - @ra + (4 * (ra**3 - (@ra - @t)**3))/(3 * Pi * (@ra**2 - (@ra - @t)**2)))**2).to_d
 
     #Section Modulus
-    @s = ((2 * @i)/@x)
+    @sx = @sy = ((2 * @ix)/@x)
 
     #Radius of Gyration
-    @r = (@i/@a).sqrt(2)
+    @rx = @ry = (@ix/@a).sqrt(2)
 
-    #Weight / ft.
-    @w = ("3.3996".to_d*@a)
-
-    #add caculated values to a hash
-    @hash = {"x" => @x.round(4), "t" => @t.round(4), "a" => @a.round(4), "i" => @i.round(4), "s" => @s.round(4), "r" => @r.round(4), "w" => @w.round(4) }
-    @bighash = {"x" => @x, "t" => @t, "a" => @a, "i" => @i, "s" => @s, "r" => @r, "w" => @w }
+    calc_weight
+    build_hash
+    diag_all
 
   end #def init
 end #Square_tube
@@ -490,36 +436,26 @@ Methods
 
 =end
 class Rec_tube
-  attr_accessor :x, :y, :t, :ra, :a, :i_x, :i_y, :s_x, :s_y, :r_x, :r_y, :w  
+  attr_accessor :x, :y, :t, :ra, :a, :ix, :iy, :sx, :sy, :rx, :ry, :w  
   include ShapeUtils; include DiagUtils; include OutputUtils
     
   private
   
-  def initialize(x, y, t, ra)  
+  def initialize(x, y, t)
     diag_class   
 
     @x = x.to_s.to_d
     @y = y.to_s.to_d
     @t = t.to_s
-    @ra = ra.to_s.to_d
-    
-    gauge_converter
-    
-    @a = BigDecimal.new("0")
-    @c = BigDecimal.new("1")
-    @i_x = BigDecimal.new("0")
-    @i_y = BigDecimal.new("0")
-    @s_x = BigDecimal.new("0")
-    @s_y = BigDecimal.new("0")
-    @r_x = BigDecimal.new("0")
-    @r_y = BigDecimal.new("0")
-    @w = BigDecimal.new("0")
 
+    corner_radius
+    gauge_converter
     
     #----------calculate area----------
     @a = (@t*((BigDecimal.new("2")*(@x+@y))-( BigDecimal.new("8")*@ra)+(Pi*(( BigDecimal.new("2")*@ra)-@t))))
 
     #method - calculate Second Moment of Inertia
+=begin
     def calc_i(c, b)
       sec_1 = ( (@t** BigDecimal.new("3")) * (b - ( BigDecimal.new("2")*@ra) ) )/ BigDecimal.new("6")
       sec_2 =  BigDecimal.new("2")*@t*(b-( BigDecimal.new("2")*@ra))
@@ -540,39 +476,25 @@ class Rec_tube
       @i = sec_1 + (sec_2 * sec_3) + sec_4 + (sec_5 * sec_6) - sec_7 + (sec_8 * sec_10)
       return(@i)
     end
+=end
     
     #call calculate Second Moment of Inertia method
-    @i_x = calc_i(@y, @x)
-    @i_y = calc_i(@x, @y)
+    @ix = BigDecimal.new("4") #calc_i(@y, @x)
+    @iy = BigDecimal.new("5") #calc_i(@x, @y)
     
-    #method - calculate Section Modulus
-    def calc_s(i, c)
-       @s = ((2*i)/c)
-       return(@s)
-    end
+    #calculate Section Modulus method
+    @sx = ((2*ix)/y)
+    @sy = (2*iy/x)
     
-    #call calculate Section Modulus method
-    @s_x = calc_s(@i_x, @y)
-    @s_y = calc_s(@i_y, @x)
+
+    @rx = sqrt(@ix/@a, 9)
+    @ry = sqrt(@iy/@a, 9)
     
+    calc_weight
     
-    #method - Radius of Gyration
-    def calc_r(i)
-       @r = sqrt(i/@a, 9)
-       return(@r)
-    end
-    
-    #call calculate radius of Gyration method
-    @r_x = calc_r(@i_x)
-    @r_y = calc_r(@i_y)
-    
-    
-    #Weight / ft.
-    @w = (3.3996.to_d*@a)
-    
-    #add caculated values to a hash
-    @hash = {"x" => @x.round(4).to_f, "y" => @y.round(4).to_f, "t" => @t.round(4).to_f, "ra" => @ra.round(4).to_f, "a" => @a.round(4).to_f, "i_x" => @i_x.round(4).to_f, "i_y" => @i_y.round(4).to_f, "s_x" => @s_x.round(4).to_f, "s_y" => @s_y.round(4).to_f, "r_x" => @r_x.round(4).to_f, "r_y" => @r_y.round(4).to_f, "w" => @w.round(4).to_f }
-    @bighash = {"x" => @x, "y" => @y, "t" => @t, "ra" => @ra, "a" => @a, "i_x" => @i_x, "i_y" => @i_y, "s_x" => @s_x, "s_y" => @s_y, "r_x" => @r_x, "r_y" => @r_y, "w" => @w }
+var_values
+    build_hash
+    diag_all
 
   end #def init
 end #class Rec_tube
@@ -588,37 +510,30 @@ FIXME: Check Math, guestimated most of it
 
 =end
 class Bar
-  attr_accessor :x, :a, :i, :s, :r, :w
+  attr_accessor :x, :y, :a, :ix, :iy, :sx, :sy, :rx, :ry, :w
   include ShapeUtils; include DiagUtils; include OutputUtils
   
   def initialize(x)
     diag_class    
 
-    @x = x.to_s.to_d
-    @a = BigDecimal.new("0")
-    @i = BigDecimal.new("0")
-    @s = BigDecimal.new("0")
-    @r = BigDecimal.new("0")
-    @w = BigDecimal.new("0")
+    @x = @y = x.to_s.to_d
 
     #calculate area
     @a = @x * @x
     
     #calculate Second Moment of Inertia
-    @i = (@x**4) / 12
-    
+    @ix = @iy = (@x**4) / 12
+
     #calculate Section Modulus
-    @s = (@x**3) / 6
+    @sx = @sy = (@x**3) / 6
     
     #calculate Radius of Gyration
-    @r = sqrt(@i / @a, 2)
+    @rx = sqrt(@ix / @a, 2)
+    @ry = sqrt(@iy / @a, 2)
     
-    #calculate weight per lin. foot
-    @w = (3.3996.to_d*@a)
-    
-    #add caculated values to a hash
-    @hash = {"x" => @x.round(4).to_f, "a" => @a.round(4).to_f, "i" => @i.round(4).to_f, "s" => @s.round(4).to_f, "r" => @r.round(4).to_f, "w" => @w.round(4).to_f }
-    @bighash = {"x" => @x, "a" => @a, "i" => @i, "s" => @s, "r" => @r, "w" => @w }
+    calc_weight
+    build_hash
+    diag_all
 
   end #def
 end #class Bar
@@ -635,7 +550,7 @@ FIXME: Check Math, guestimated most of it
 
 =end
 class Plate
-  attr_accessor :x, :y, :a, :i_x, :i_y, :s_x, :s_y, :r_x, :r_y, :w
+  attr_accessor :x, :y, :a, :ix, :iy, :sx, :sy, :rx, :ry, :w
   include ShapeUtils; include DiagUtils; include OutputUtils
   
   def initialize(x, y)  
@@ -643,77 +558,61 @@ class Plate
 
     @x = x.to_s.to_d
     @y = y.to_s.to_d
-    @a = BigDecimal.new("0")
-    @i_x = BigDecimal.new("0")
-    @i_y = BigDecimal.new("0")
-    @s_x = BigDecimal.new("0")
-    @s_y = BigDecimal.new("0")
-    @r_x = BigDecimal.new("0")
-    @r_y = BigDecimal.new("0")
-    @w = BigDecimal.new("0")
 
     #calculate area
     @a = @x * @y
     
     #calculate Second Moment of Inertia
-    @i_x = (@x * @y**3) / 12
-    @i_y = (@y * @x**3) / 12
+    @ix = (@x * @y**3) / 12
+    @iy = (@y * @x**3) / 12
     
     #calculate Section Modulus - BROKEN
-#    @s = (@x**3) / 6
+    @sx = (@x**3) / 6
+    @sy = (@y**3) / 6
 
     #calculate Radius of Gyration - BROKEN
-#    @r = sqrt(@i / @a, 2)
+    @rx = sqrt(@ix / @a, 2)
+    @ry = sqrt(@iy / @a, 2)
 
-    #calculate weight per lin. foot
-    @w = (3.3996.to_d*@a)
+    calc_weight
+    build_hash
+    diag_all
 
-    #add caculated values to a hash
-    @hash = {"x" => @x.round(4).to_f, "a" => @a.round(4).to_f, "i_x" => @i_x.round(4).to_f, "i_y" => @i_y.round(4).to_f, "s_x" => @s_x.round(4).to_f, "s_y" => @s_y.round(4).to_f, "r_x" => @r_x.round(4).to_f, "r_y" => @r_y.round(4).to_f, "w" => @w.round(4).to_f }
-    @bighash = {"x" => @x, "a" => @a, "i_x" => @i_x, "i_y" => @i_y, "s_x" => @s_x, "s_y" => @s_y, "r_x" => @r_x, "r_y" => @r_y, "w" => @w }
   end #def init
 end #class Plate
 
 =begin
 
-Class Rod(d)
+Class Rod(x)
   definition of variables
-  d = diameter
+  x = diameter
 
 =end
 class Rod
-  attr_accessor :x, :a, :i, :s, :r, :w
+  attr_accessor :x, :y, :a, :ix, :iy, :sx, :sy, :rx, :ry, :w
   include ShapeUtils; include DiagUtils; include OutputUtils
   
   def initialize(x)
     diag_class
     
     @x = x.to_s.to_d
-     
-    @a = BigDecimal.new("0")
-    @i = BigDecimal.new("0")
-    @s = BigDecimal.new("0")
-    @r = BigDecimal.new("0")
-    @w = BigDecimal.new("0")
-    
+    @y = @x
     #calculate area
     @a = Pi * (@x / 2)**2 
     
     #calculate Second Moment of Inertia
-    @i = (Pi/64)*(x**4)
+    @ix = @iy = (Pi/64)*(x**4)
     
     #calculate Section Modulus
-    @s = Pi * @x ** 3 /32
+    @sx = @sy = Pi * @x ** 3 /32
     
     #calculate Radius of Gyration
-    @r = sqrt(@i / @a, 2)
+    @rx = @ry = sqrt(@ix / @a, 2)
     
-    #calculate weight per lin. foot
-    @w = (3.3996.to_d*@a)
-    
-    #add caculated values to a hash
-    @hash = {"x" => @x.round(4).to_f, "a" => @a.round(4).to_f, "i" => @i.round(4).to_f, "s" => @s.round(4).to_f, "r" => @r.round(4).to_f, "w" => @w.round(4).to_f }
-    @bighash = {"x" => @x, "a" => @a, "i" => @i, "s" => @s, "r" => @r, "w" => @w }
+    calc_weight 
+    build_hash
+    diag_all
+
   end #def init
 end #class Rod
 
@@ -723,18 +622,21 @@ end #class Rod
 ########################
 include ShapeUtils; include DiagUtils; include OutputUtils
 
-#  Square_tube.new(1, 18).props("t")
+#  Square_tube.new(1, 18).props
 #  Square_tube.new(1, 18).props
 #  Square_tube.new(1, 18).bigprops("t")
 #  Square_tube.new(1, 18).bigprops
 #  Square_tube.new(1, 18).hash
 #  Square_tube.new(1, 18).bighash
 #  columns_header
-columns_header
-Square_tube.new(1, 18).columns
+#  columns_header
+#  Square_tube.new(1, 18).columns
 
+#  Square_tube.new(1, 18).props
+#  puts
 #  Round_tube.new(4, 18).props
-#  Rec_tube.new(1.0, 3.0, 0.065, 0.005).props
-#  Bar.new(5.0).props
+
+#  Rec_tube.new(1.0, 3.0, 0.065).props
+  Bar.new(5.0).props
 #  Plate.new(4, 5).props
 #  Rod.new(2).props

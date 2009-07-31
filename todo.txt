@@ -2,6 +2,10 @@
 FIXME
 =begin
 
+  REVISE: standardize variables: x, y, t, ix, iy, sx, sy, rx, ry, w
+  
+  ADD: Create add hash method using new standardized variables
+
   FIXME: finish implimenting the ShapeUtils::corner_radius method
 
     if $radius_factors.key?(@t)
@@ -38,6 +42,9 @@ solution #3 (calculate delta)
         rinse & repeat
         @ra = hash value using closest key
 
+solution #4
+    multiple hash values up to integers
+    then look for the closest match?
 
 $gauge_factors = {
 
