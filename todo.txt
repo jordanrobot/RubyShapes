@@ -15,9 +15,21 @@ FIXME
         ##this is only working with gauges, not decimal thickness right now
 
 solution #1
-    turn gauge into decimal first
+    (search values for an approximate match to @t)
+    turn @t into decimal first
     look for a key that is within a certain tolerance
       t_upper = @t + 0.0005; t_lower = @t - 0.0005
+
+solution #2
+    (search for the value closest to the @t; turn @t into decimal first)
+      check for equal value, if found - use; if not:
+      if @t > value, move on to next value, rinse & repeat until
+        @t < value
+        store next highest and next lowest values to @t as temp vars
+        do a little math to see which is closer to @t
+
+
+
 
 $gauge_factors = {
 

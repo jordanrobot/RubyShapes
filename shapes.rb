@@ -54,9 +54,9 @@ include BigMath
 #Constants
 Pi = BigDecimal.PI(20)
 $gauge_factors = { 30=>0.012, 29=>0.013, 28=>0.014, 27=>0.016, 26=>0.018, 25=>0.020, 24=>0.022, 23=>0.025, 22=>0.028, 21=>0.032, 20=>0.035, 18=>0.049, 16=>0.065, 14=>0.083, 13=>0.095, 12=>0.109, 11=>0.120, 10=>0.134, 9=>0.148, 8=>0.165, 7=>0.180, 6=>0.203, 5=>0.220, 4=>0.238, 3=>0.259, 2=>0.284, 1=>0.300, 0=>0.34, 00=>0.38, 000=>0.425, 0000=>0.454 }
-$radius_factors = { 20=>"0.04675", 19=>"0.0625", 18=>"0.0625", 16=>"0.0859375" }
+$radius_factors = { 0.035=>"0.04675", 0.049=>"0.0625", 18=>"0.0625", 16=>"0.0859375" }
 
-DIAGNOSTICS = "off"
+DIAGNOSTICS = "on"
 
 
 ############################
@@ -315,7 +315,7 @@ module ShapeUtils
     
     if $radius_factors.key?(@t)
       @ra = BigDecimal.new("#{$radius_factors[@t]}")
-      diag_line("radius was calculated")
+#      diag_line("radius was calculated")
     else
       @ra = BigDecimal.new("0.03125")
       diag_line("radius could not be calculated: using default value")
@@ -324,6 +324,8 @@ module ShapeUtils
 #    equiv_diam = (((@x * 2) + (@y * 2)) / Pi)
 #    diag_line("equivalent diameter:   #{equiv_diam.round(4)}, #{equiv_diam.class}")
     diag_line("@radius:                #{@ra.to_f.to_s}, #{@ra.class}")
+
+
   end #def corner_radius
 
 =begin
@@ -729,7 +731,7 @@ include ShapeUtils; include DiagUtils; include OutputUtils
 #  Square_tube.new(1, 18).bighash
 #  columns_header
 columns_header
-Square_tube.new(1, 16).columns
+Square_tube.new(1, 18).columns
 
 #  Round_tube.new(4, 18).props
 #  Rec_tube.new(1.0, 3.0, 0.065, 0.005).props
