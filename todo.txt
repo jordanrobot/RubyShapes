@@ -28,7 +28,15 @@ solution #2
         store next highest and next lowest values to @t as temp vars
         do a little math to see which is closer to @t
 
-
+solution #3 (calculate delta)
+    compare deltas of @t & keys in the $radius_factors hash, 
+    @ra = value that results in the lowest delta
+        calc delta
+        test if lower than previous delta
+        discard if not lower than pervious
+        calculate next delta.
+        rinse & repeat
+        @ra = hash value using closest key
 
 
 $gauge_factors = {
