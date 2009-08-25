@@ -1,0 +1,125 @@
+ShapeUtils::corner_radius method
+
+Theory/Possible Solutions
+
+
+Problem:
+	"Calculate" or look up corner radius values for rectangular/square steel (mechanical tubing) shapes
+	as specified in:
+		The Handbook of Welded Carbon Steel Mechanical Tubing
+		published by: Steel Tube Institute of America
+		http://www.steeltubeinstitute.org/
+
+	-make forward-compatible with rectangular/square Hollow Structural Steel Sections?
+
+
+
+Possible Solutions:
+
+    look for a key (in $radius_factors) that matches @t
+    if found, return the corresponding value
+    ##this is only working with gauges, not decimal thickness right now
+
+solution #1
+    (search values for an approximate match to @t)
+    turn @t into decimal first
+    look for a key that is within a certain tolerance
+      t_upper = @t + 0.0005; t_lower = @t - 0.0005
+
+solution #2
+    (search for the value closest to the @t; turn @t into decimal first)
+      check for equal value, if found - use; if not:
+      if @t > value, move on to next value, rinse & repeat until
+        @t < value
+        store next highest and next lowest values to @t as temp vars
+        do a little math to see which is closer to @t
+
+solution #3 (calculate delta)
+    compare deltas of @t & keys in the $radius_factors hash, 
+    @ra = value that results in the lowest delta
+        calc delta
+        test if lower than previous delta
+        discard if not lower than pervious
+        calculate next delta.
+        rinse & repeat
+        @ra = hash value using closest key
+
+solution #4
+    multiple hash values up to integers
+    then look for the closest match?
+
+
+
+===Corner Radius Values===
+from Handbook of WCSMT
+
+(steel gauge)  (range of thicknesses inches)
+	(equivalent diameter)
+
+    24ga  1/64  0.03125  3/64
+      1/2" to 1 1/2"
+      
+    22ga  0.09375
+      1/2 to 1 1/2"
+
+    20ga  0.09375
+      1/2 tp 2 1/2
+
+    19ga  0.0625
+      1/2 to 2 1/2
+
+    18ga  3/64  0.0625  5/64
+      1/2 to 4
+
+    16ga  4/64  0.0859375  7/64
+      1/2 to 4 1/8
+
+    14ga  5/64  0.1015625  1/8
+      3/4 to 4 1/8
+    14ga  3/16  1/4  5/15
+      4 1/8 to 6
+
+    13ga  3/32  0.125  5/32
+      1 to 4 1/8
+    13ga  3/16  0.25  5/16
+      4 1/8 to 6
+
+    12ga  1/8   0.1640625  13/64
+      1 1/4 to 4
+    12ga  3/16  0.25  5/16
+      4 to 6
+
+    11ga  1/8   0.1640625  13/64
+      1 1/4 to 4
+    11ga  7/32  0.328125  7/16
+      4 to 6
+
+    10ga  5/32  0.21875  9/32
+      2 to 4
+    10ga  7/32  0.328125  7/16
+      4 to 6
+
+    9ga   3/16  0.25  5/16
+      2 to 4
+    9ga   7/32  0.328125  7/16
+      4 to 8
+
+    8ga   1/4   0.375  1/2
+      2 to 8
+
+    7ga   1/4   0.375  1/2
+      2 to 8
+
+    6ga   5/16  0.4375  9/16
+      2 1/2 to 4
+    6ga   5/16  0.4375  9/16
+      4 to 8
+
+    5ga   3/8   0.5  5/8
+      2 1/2 to 8
+
+    4ga   3/8   0.5  5/8
+      2 1/2 to 8
+
+    3ga   3/8   0.5  5/8
+      2 1/2 to 8
