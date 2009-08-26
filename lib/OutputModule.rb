@@ -1,9 +1,17 @@
+#!/usr/bin/env ruby
+
+#RubyShapes
+#
+#Copyright 2009 Matthew D. Jordan
+#www.scenic-shop.com
+#shared under the GNU GPLv3
+
 ##############################
 ###   OutputUtils Module   ###
 ##############################
 
 #this module handles i/o of the calculated shape values
-module OutputUtils
+module Output
 
   #prints attributes of shape, rounded to 4 places (floats).  If no specific variable is specified, props will return all attributes.  If a variable is specified [ object.props("variable") ], props returns only that specific attribute.
   def props(arg="list")

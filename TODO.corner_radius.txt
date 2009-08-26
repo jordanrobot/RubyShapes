@@ -1,4 +1,4 @@
-ShapeUtils::corner_radius method
+ShapeUtilities::corner_radius method
 
 Theory/Possible Solutions
 

@@ -1,78 +1,44 @@
 #!/usr/bin/env ruby
-#
-#RubyShapes v 0.2.9
+
+#RubyShapes
 #
 #Copyright 2009 Matthew D. Jordan
 #www.scenic-shop.com
 #shared under the GNU GPLv3
-#
-#==License
-#
-#    This file is part of RubyShapes.
-#    
-#    RubyShapes is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#    
-#    RubyShapes is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#    
-#    You should have received a copy of the GNU General Public License
-#    along with RubyShapes.  If not, see <http://www.gnu.org/licenses/>.
-#
-#==What this library does:
-#
-#* Defines ruby objects which represent real world cross-section shapes.  Returns geopmetric properties useful to structural designers.  Right now the weight values are calculated assuming the material is steel.
-#* Each type of shape is a different object. i.e., square, rectangle, circle, hollow circle...
-#* Each objects' input parameters are:
-#  a. the dimensions that decribe the shape
-#  b. the values that are used to calculate the geometric properties for that cross-sectional shape/object
-#* This library is divided into several modules for maximum mixin lovin'
-#  a. DiagUtils Module - Diagnostic messages. -- I could probably use a fully fledged testing and debugging library, but I'm not familiar with any yet.
-#  b. OutputUtils Module - Defines the methods that output the Object variables
-#  c. ShapeUtils Module - Defines property calculations that are common to multiple Shape Classes
-#* The Shape Classes - the meat!
-#  a. Round_tube class
-#  b. Square_tube class 
-#  c. Rec_tube
-#  d. Bar class
-#  e. Plate class
-#  f. Rod class
 
+
+#Load standard modules
 require 'bigdecimal'
 require 'bigdecimal/math'
 require 'bigdecimal/util'
 include BigMath
 
+#Load RubyShapes specific modules
+require "lib/DiagnosticsModule.rb"
+require "lib/OutputModule.rb"
+require "lib/ShapeUtilitiesModule.rb"
+
+include Diagnostics
+include Output
+include ShapeUtilities
 
 #Constants
 Pi = BigDecimal.PI(20)
-$gauge_factors = { 30=>0.012, 29=>0.013, 28=>0.014, 27=>0.016, 26=>0.018, 25=>0.020, 24=>0.022, 23=>0.025, 22=>0.028, 21=>0.032, 20=>0.035, 18=>0.049, 16=>0.065, 14=>0.083, 13=>0.095, 12=>0.109, 11=>0.120, 10=>0.134, 9=>0.148, 8=>0.165, 7=>0.180, 6=>0.203, 5=>0.220, 4=>0.238, 3=>0.259, 2=>0.284, 1=>0.300, 0=>0.34, 00=>0.38, 000=>0.425, 0000=>0.454 }
-$radius_factors = { 0.035=>"0.04675", 0.049=>"0.0625", 18=>"0.0625", 16=>"0.0859375" }
 
 #Diagnostics Flag
 DIAGNOSTICS = "off"
-
-#Load various modules
-require "DiagUtils.rb"
-require "OutputUtils.rb"
-require "ShapeUtils.rb"
-
 
 #########################
 ###   Shape Classes   ###
 #########################
 
 #=Class Round_tube(od, thickness)
-#  parameters
+#  parameters:
 #    @x = outside diameter
 #    @t = thickness of tubing
 class Round_tube
   attr_accessor :x, :y, :a, :ix, :iy, :sx, :sy, :rx, :ry, :w
-  include ShapeUtils; include DiagUtils; include OutputUtils
+  include ShapeUtilities; include Diagnostics; include Output
 
   def initialize(x, t)  
     diag_class
@@ -103,13 +69,13 @@ end #class Round_tube
 
 
 #=Class Square_tube(od, thickness, radius)
-#  parameters
+#  parameters:
 #    @x  = outside diameter
 #    @t  = thickness of tubing
 #    @ra = radius at corner
 class Square_tube
   attr_accessor :x, :y, :a, :ix, :iy, :sx, :sy, :rx, :ry, :w, :ra
-  include ShapeUtils; include DiagUtils; include OutputUtils
+  include ShapeUtilities; include Diagnostics; include Output
     
   def initialize(x, t)
     diag_class
@@ -142,13 +108,13 @@ end #Square_tube
 
 #=Class Rec_tubing(d_x, d_y, ra, thick)
 #
-#  parameters
+#  parameters:
 #  d = box tube width, height
 #  ra = radius of corner
 #  t = wall thickness
 class Rec_tube
   attr_accessor :x, :y, :t, :ra, :a, :ix, :iy, :sx, :sy, :rx, :ry, :w  
-  include ShapeUtils; include DiagUtils; include OutputUtils
+  include ShapeUtilities; include Diagnostics; include Output
   
   def initialize(x, y, t)
     diag_class   
@@ -192,7 +158,7 @@ end #class Rec_tube
 #  x = bar dimension - x & y    
 class Bar
   attr_accessor :x, :y, :a, :ix, :iy, :sx, :sy, :rx, :ry, :w
-  include ShapeUtils; include DiagUtils; include OutputUtils
+  include ShapeUtilities; include Diagnostics; include Output
   
   def initialize(x)
     diag_class    
@@ -229,7 +195,7 @@ end #class Bar
 #  y = dimension
 class Plate
   attr_accessor :x, :y, :a, :ix, :iy, :sx, :sy, :rx, :ry, :w
-  include ShapeUtils; include DiagUtils; include OutputUtils
+  include ShapeUtilities; include Diagnostics; include Output
   
   def initialize(x, y)  
     diag_class
@@ -265,7 +231,7 @@ end #class Plate
 #  x = diameter
 class Rod
   attr_accessor :x, :y, :a, :ix, :iy, :sx, :sy, :rx, :ry, :w
-  include ShapeUtils; include DiagUtils; include OutputUtils
+  include ShapeUtilities; include Diagnostics; include Output
   
   def initialize(x)
     diag_class
@@ -291,11 +257,9 @@ class Rod
   end #def init
 end #class Rod
 
-
-########################
-###   Testing Area   ###
-########################
-include ShapeUtils; include DiagUtils; include OutputUtils
+##########################
+###    Testing area    ###
+##########################
 
 #  Square_tube.new(1, 18).props
 #  Square_tube.new(1, 18).props

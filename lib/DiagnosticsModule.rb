@@ -1,9 +1,17 @@
-############################
-###   DiagUtils Module   ###
-############################
+#!/usr/bin/env ruby
+
+#RubyShapes
+#
+#Copyright 2009 Matthew D. Jordan
+#www.scenic-shop.com
+#shared under the GNU GPLv3
+
+##############################
+###   Diagnostics Module   ###
+##############################
 
 #This module handles Diagnostic messages.
-module DiagUtils
+module Diagnostics
 
 #Outputs a diagnostic section(header) line to the screen. Only prints when Diagnostics = on
   def diag_section(arg)
@@ -31,7 +39,7 @@ module DiagUtils
   end #def diag_class
 
 
-#Prints all OutputUtils Module methods at once for any given shape object. Only prints when Diagnostics = on
+#Prints all Output Module methods at once for any given shape object. Only prints when Diagnostics = on
   def test_output
     if DIAGNOSTICS == "on"
       diag_section("testing shape object's output")
@@ -112,5 +120,4 @@ module DiagUtils
 #    self.inspect
   end #diag_all
   
-end #module DiagUtils
-
+end #Diagnostics Module

@@ -1,11 +1,11 @@
-==Shapes Library Todo File==
+==RubyShapes Library Todo File
 
-  Matthew D. Jordan
+  Copyright 2009 Matthew D. Jordan
   www.scenic-shop.com
-  shared under the GNU GPLv3
+  shared under the GNU GPLv3 - see LICENSE.txt
 
 
-  CONSIDER: revising structure? Separate classes into:
+CONSIDER: revising structure? Separate classes into:
 	- solid shapes
 	- "theoretical" hollow shapes
 	- mechanical tubing shapes
@@ -13,31 +13,47 @@
 	- nominal pipe size shapes
 	- maybe, someday, structural beams (I, C, Z...) - already implimented in a handy excel file from AISC, complicated! woot.
 
-  FIXME: Rectangular tubing accuracy is off just a little bit?
-        -precision in the millionths seems to be off
-		-the trouble starts in the I calculation, steamrolls through S, & R values.
-		-tested formula in Mathematica, it corresponds to the ruby output.  the problem seems to lie in which corner radius is specified in the calculations.  Since the corner radius for any given tubing is listed as a range of values, I don't know which ones the Steel Tube Institute used!  Bastards.
 
-  FIXME: Bar class returns odd I values to bar.props, steamrolls to S & R properties
+==FIXME
 
-  VERIFY: Bar math - only guesstimates
+FIXME: Rectangular tubing accuracy is off just a little bit?
+    - precision in the millionths seems to be off
+	- the trouble starts in the I calculation, steamrolls through S, & R values.
+	- tested formula in Mathematica, it corresponds to the ruby output.  the problem seems to lie in which corner radius is specified in the calculations.  Since the corner radius for any given tubing is listed as a range of values, I don't know which ones the Steel Tube Institute used!  Bastards.
 
-  ADD: Add radius of gyration variable?
-  ADD: Add extreme fiber distance variable?
-  ADD: Create add_hash method using new standardized variables?
+FIXME: Bar class returns odd I values to bar.props, steamrolls to S & R properties
 
 
-  TODO: Replace DiagUtils Module for a real diagnostic & debugging library.
-  TODO: create ShapeUtils::pipe_converter method, same as gauge_converter, based on schedule system
-  TODO: Create testing method/module/mixin to verify math and return a pass/fail
-        -Manually enter several accurate results (through range of sizes) w/ corresponding inputs?
-        -Check that calculations == accurate results
-        -Give a prelim pass/fail based on results
-  TODO: hand calculate some of the properties and see if the float values fudge accuracy
-  TODO: Merge Rec_tubing and Square_tubing class? - (using calcs from rec_tubing class)
+==VERIFY
+
+VERIFY: Bar math - only guesstimates
+
+
+==ADD
+
+ADD: A verify flag for each shape class?  
+	- Each shape class will print a "math not verified for ___ shape"
+	- Toggling the flag will make this statement go away.
+	- Tie into an automated test suite for this?
+ADD: Add variable for Iz, Sz, & Rz?
+ADD: Add extreme fiber distance variable?
+ADD: Create add_hash method using new standardized variables?
+
+
+==TODO
+
+TODO: Replace Diagnostics Module for a real diagnostic & debugging library.
+TODO: create ShapeUtilities::pipe_converter method
+	- same as gauge_converter, based on schedule system
+TODO: Create testing method/module/mixin to verify math and return a pass/fail
+    - Manually enter several accurate results (through range of sizes) w/ corresponding inputs?
+    - Check that calculations == accurate results
+    - Give a prelim pass/fail based on results
+TODO: hand calculate some of the properties and see if the float values fudge accuracy
+TODO: Merge Rec_tubing and Square_tubing class? - (using calcs from rec_tubing class)
   
 
-==REFERENCE==
+==Reference Data
 
 $gauge_factors = {
 
