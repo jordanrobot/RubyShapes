@@ -1,13 +1,30 @@
 #!/usr/bin/env ruby
-
-
-#=Shapes Library v 0.2.9
-#  Matthew D. Jordan
-#  www.scenic-shop.com
-#  shared under the GNU GPLv3
 #
+#RubyShapes v 0.2.9
 #
-#=What this library does:
+#Copyright 2009 Matthew D. Jordan
+#www.scenic-shop.com
+#shared under the GNU GPLv3
+#
+#==License
+#
+#    This file is part of RubyShapes.
+#    
+#    RubyShapes is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#    
+#    RubyShapes is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#    
+#    You should have received a copy of the GNU General Public License
+#    along with RubyShapes.  If not, see <http://www.gnu.org/licenses/>.
+#
+#==What this library does:
+#
 #* Defines ruby objects which represent real world cross-section shapes.  Returns geopmetric properties useful to structural designers.  Right now the weight values are calculated assuming the material is steel.
 #* Each type of shape is a different object. i.e., square, rectangle, circle, hollow circle...
 #* Each objects' input parameters are:
@@ -31,7 +48,6 @@ require 'bigdecimal/util'
 include BigMath
 
 
-
 #Constants
 Pi = BigDecimal.PI(20)
 $gauge_factors = { 30=>0.012, 29=>0.013, 28=>0.014, 27=>0.016, 26=>0.018, 25=>0.020, 24=>0.022, 23=>0.025, 22=>0.028, 21=>0.032, 20=>0.035, 18=>0.049, 16=>0.065, 14=>0.083, 13=>0.095, 12=>0.109, 11=>0.120, 10=>0.134, 9=>0.148, 8=>0.165, 7=>0.180, 6=>0.203, 5=>0.220, 4=>0.238, 3=>0.259, 2=>0.284, 1=>0.300, 0=>0.34, 00=>0.38, 000=>0.425, 0000=>0.454 }
@@ -40,6 +56,7 @@ $radius_factors = { 0.035=>"0.04675", 0.049=>"0.0625", 18=>"0.0625", 16=>"0.0859
 #Diagnostics Flag
 DIAGNOSTICS = "off"
 
+#Load various modules
 require "DiagUtils.rb"
 require "OutputUtils.rb"
 require "ShapeUtils.rb"
@@ -53,7 +70,6 @@ require "ShapeUtils.rb"
 #  parameters
 #    @x = outside diameter
 #    @t = thickness of tubing
-
 class Round_tube
   attr_accessor :x, :y, :a, :ix, :iy, :sx, :sy, :rx, :ry, :w
   include ShapeUtils; include DiagUtils; include OutputUtils
@@ -91,7 +107,6 @@ end #class Round_tube
 #    @x  = outside diameter
 #    @t  = thickness of tubing
 #    @ra = radius at corner
-
 class Square_tube
   attr_accessor :x, :y, :a, :ix, :iy, :sx, :sy, :rx, :ry, :w, :ra
   include ShapeUtils; include DiagUtils; include OutputUtils
@@ -131,7 +146,6 @@ end #Square_tube
 #  d = box tube width, height
 #  ra = radius of corner
 #  t = wall thickness
-
 class Rec_tube
   attr_accessor :x, :y, :t, :ra, :a, :ix, :iy, :sx, :sy, :rx, :ry, :w  
   include ShapeUtils; include DiagUtils; include OutputUtils
@@ -176,8 +190,6 @@ end #class Rec_tube
 #
 #  parameters:
 #  x = bar dimension - x & y    
-
-
 class Bar
   attr_accessor :x, :y, :a, :ix, :iy, :sx, :sy, :rx, :ry, :w
   include ShapeUtils; include DiagUtils; include OutputUtils
@@ -215,7 +227,6 @@ end #class Bar
 #  parameters:
 #  x = dimension
 #  y = dimension
-
 class Plate
   attr_accessor :x, :y, :a, :ix, :iy, :sx, :sy, :rx, :ry, :w
   include ShapeUtils; include DiagUtils; include OutputUtils
@@ -252,7 +263,6 @@ end #class Plate
 #=Class Rod(x)
 #  parameters:
 #  x = diameter
-
 class Rod
   attr_accessor :x, :y, :a, :ix, :iy, :sx, :sy, :rx, :ry, :w
   include ShapeUtils; include DiagUtils; include OutputUtils
